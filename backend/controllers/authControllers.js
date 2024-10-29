@@ -1,25 +1,28 @@
 import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import { generateTokenAndSetCookie } from "../lib/utils/generateTokenAndSetCookie.js";
+
 export const signup = async (req, res) => {
   try {
     const { fullName, username, email, password } = req.body;
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
     if (!emailRegex.test(email)) {
-      return res.status(400).json({
-        error: "Invalid email format",
-      });
+      return res.status(400).json({ error: "Invalid email format" });
     }
-    const existingUser = await User.find({ username: username });
+
+    const existingUser = await User.findOne({ username });
     if (existingUser) {
-      return res.status(400).json({
-        error: "Existing Username",
-      });
+      return res.status(400).json({ error: "Existing Username" });
     }
-    const existingEmail = await User.find({ email: email });
+
+    const existingEmail = await User.findOne({ email });
     if (existingEmail) {
+      return res.status(400).json({ error: "Existing Email" });
+    }
+    if (password < 6) {
       return res.status(400).json({
-        error: "Existing Email",
+        error: "Password must be at least 6 characters",
       });
     }
     const encryptedPassword = await bcrypt.hash(password, 12);
@@ -29,28 +32,83 @@ export const signup = async (req, res) => {
       email,
       password: encryptedPassword,
     });
-    if (newUser) {
-      generateTokenAndSetCookie(newUser._id, res);
-      await newUser.save();
-      res.status(201).json({
-        fullName: newUser.fullName,
-        username: newUser.username,
-        email: newUser.email,
-        followers: newUser.followers,
-        following: newUser.following,
-        profileImg: newUser.profileImg,
-        coverImg: newUser.coverImg,
-      });
-    } else {
+
+    await newUser.save();
+    generateTokenAndSetCookie(newUser._id, res);
+
+    res.status(201).json({
+      _id: newUser._id,
+      fullName: newUser.fullName,
+      username: newUser.username,
+      email: newUser.email,
+      followers: newUser.followers,
+      following: newUser.following,
+      profileImg: newUser.profileImg,
+      coverImg: newUser.coverImg,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const login = async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const checkUser = await User.findOne({ username });
+    if (!checkUser) {
       return res.status(400).json({
-        error: "Invalid user data",
+        error: "User doesn't exist",
       });
     }
+
+    const isPassword = await bcrypt.compare(password, checkUser.password);
+
+    if (!isPassword) {
+      return res.status(400).json({
+        error: "Password is not correct",
+      });
+    }
+    generateTokenAndSetCookie(checkUser._id, res);
+    res.status(200).json({
+      message: "Login successful",
+      user: {
+        checkUser,
+      },
+    });
   } catch (error) {
     res.status(500).json({
-      error: "Internal Server Error",
+      error: "Error in login",
+      message: error.message,
+      stack: error.stack,
     });
   }
 };
-export const login = async () => {};
-export const logout = async () => {};
+export const logout = async (req, res) => {
+  try {
+    res.cookie("jwt", "", { maxAge: 0 });
+    res.status(200).json({
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: "Error in logout",
+      message: error.message,
+      stack: error.stack,
+    });
+  }
+};
+
+export const getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req?.user._id).select("-password");
+    res.status(200).json({
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: "Error in getMe",
+      message: error.message,
+      stack: error.stack,
+    });
+  }
+};
