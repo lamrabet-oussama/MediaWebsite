@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import connectDB from "./db/connectDB.js";
 const app = express();
 dotenv.config();
+app.use(express.json()); //to parse req.body
+app.use(express.urlencoded({ extended: true })); //to parse from data (urlenoded)
 app.use("/api/auth", authRoutes);
 const PORT = process.env.PORT || 5000;
 app.listen(process.env.PORT, () => {
