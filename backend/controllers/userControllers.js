@@ -113,62 +113,69 @@ export const updateUserProfile = async (req, res) => {
     req.body;
   let { profileImg, coverImg } = req.body;
   const userId = req.user._id;
+
   try {
-    const user = await User.findById(userId);
+    let user = await User.findById(userId);
     if (!user) {
-      res.status(404).json({
-        message: "User not found",
-      });
+      return res.status(404).json({ message: "User not found" });
     }
-    if (!currentPassword || !newPassword) {
-      res.status(400).json({
+
+    if (
+      (!newPassword && currentPassword) ||
+      (!currentPassword && newPassword)
+    ) {
+      return res.status(400).json({
         error: "Please provide both current password and new password",
       });
     }
+
     if (currentPassword && newPassword) {
       const check = await bcrypt.compare(currentPassword, user.password);
       if (!check) {
-        res.status(400).json({
-          error: "Current Password is incorrect",
-        });
+        return res.status(400).json({ error: "Current Password is incorrect" });
       }
       if (newPassword.length < 6) {
-        res.status(400).json({
-          error: "Password must contain at least 6 caracters",
+        return res.status(400).json({
+          error: "Password must contain at least 6 characters",
         });
       }
       user.password = await bcrypt.hash(newPassword, 12);
-      if (profileImg) {
-        if (user.profileImg) {
-          await cloudinary.uploader.destroy(
-            user.profileImg.split("/").pop().split(".")[0]
-          );
-        }
-        const uploadedResponse = await cloudinary.uploader.upload(profileImg);
-        profileImg = uploadedResponse.secure_url;
-      }
-      if (coverImg) {
-        if (user.coverImg) {
-          await cloudinary.uploader.destroy(
-            user.coverImg.split("/").pop().split(".")[0]
-          );
-        }
-        const uploadedResponse = await cloudinary.uploader.upload(coverImg);
-        coverImg = uploadedResponse.secure_url;
-      }
-      user.fullName = fullName || user.fullName;
-      user.email = email || user.email;
-      user.bio = bio || user.bio;
-      user.link = link || user.link;
-      user.profileImg = profileImg || user.profileImg;
-      user.coverImg = coverImg || user.coverImg;
-      user = await user.save();
-      user.password = null;
-      res.status(200).json(user);
     }
+
+    if (profileImg) {
+      if (user.profileImg) {
+        await cloudinary.uploader.destroy(
+          user.profileImg.split("/").pop().split(".")[0]
+        );
+      }
+      const uploadedResponse = await cloudinary.uploader.upload(profileImg);
+      profileImg = uploadedResponse.secure_url;
+    }
+
+    if (coverImg) {
+      if (user.coverImg) {
+        await cloudinary.uploader.destroy(
+          user.coverImg.split("/").pop().split(".")[0]
+        );
+      }
+      const uploadedResponse = await cloudinary.uploader.upload(coverImg);
+      coverImg = uploadedResponse.secure_url;
+    }
+
+    user.fullName = fullName || user.fullName;
+    user.username = username || user.username;
+    user.email = email || user.email;
+    user.bio = bio || user.bio;
+    user.link = link || user.link;
+    user.profileImg = profileImg || user.profileImg;
+    user.coverImg = coverImg || user.coverImg;
+
+    await user.save();
+    user.password = null; // Retirer le mot de passe pour la réponse
+    return res.status(200).json(user);
   } catch (error) {
-    res.status(500).json({
-      error: "Error in getSuggestedUser",
+    return res.status(500).json({
+      error: "Error in updateUserProfile",
       message: error.message,
       stack: error.stack,
     });
