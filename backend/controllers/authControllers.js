@@ -4,7 +4,15 @@ import { generateTokenAndSetCookie } from "../lib/utils/generateTokenAndSetCooki
 
 export const signup = async (req, res) => {
   try {
-    const { fullName, username, email, password } = req.body;
+    const {
+      fullName,
+      username,
+      email,
+      password,
+      birthDay,
+      birthMonth,
+      birthYear,
+    } = req.body;
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if (!emailRegex.test(email)) {
@@ -30,6 +38,9 @@ export const signup = async (req, res) => {
       fullName,
       username,
       email,
+      birthDay,
+      birthMonth,
+      birthYear,
       password: encryptedPassword,
     });
 
@@ -40,6 +51,9 @@ export const signup = async (req, res) => {
       _id: newUser._id,
       fullName: newUser.fullName,
       username: newUser.username,
+      birthDay: newUser.birthDay,
+      birthMonth: newUser.birthMonth,
+      birthYear: newUser.birthMonth,
       email: newUser.email,
       followers: newUser.followers,
       following: newUser.following,
@@ -47,7 +61,11 @@ export const signup = async (req, res) => {
       coverImg: newUser.coverImg,
     });
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+      errorStack: error.stack,
+    });
   }
 };
 

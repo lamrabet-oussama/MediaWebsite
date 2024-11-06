@@ -1,0 +1,91 @@
+.signup-bg {
+  background: #fffbef;
+}
+
+.signup-form {
+  caret-color: #fab400;
+}
+
+.container {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.container input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+.mark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid #fab400;
+}
+
+.container input:checked ~ .mark {
+  background-color: #fab400;
+}
+.mark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  transition: all 200ms ease-in-out;
+}
+
+.container input:checked ~ .mark:after {
+  display: block;
+  transform: scale(1);
+}
+.container .mark:after {
+  content: "";
+  left: 33%;
+  top: 25%;
+  width: 8px;
+  height: 8px;
+  background-color: white;
+  transform: scale(0);
+  border-radius: 50%;
+}
+.gradient-background {
+  background: linear-gradient(
+    300deg,
+    #aaaad6,
+    #b9a778,
+    #aa8f5d,
+    #fffffd,
+    #bcbc8c
+  );
+  background-size: 300% 300%;
+  animation: gradient-animation 30s ease infinite;
+}
+.login-bg {
+  background: #fffbef;
+}
+
+.login-form {
+  caret-color: #fab400;
+}
+@keyframes gradient-animation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
