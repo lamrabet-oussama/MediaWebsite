@@ -27,7 +27,7 @@ const Post = ({ post }) => {
 
   return (
     <>
-      <div className="flex gap-2 items-start p-4 border-b border-gray-700">
+      <div className="flex gap-2 items-start p-4 border-b border-or-website">
         <div className="avatar">
           <Link
             to={`/profile/${postOwner.username}`}
@@ -51,7 +51,7 @@ const Post = ({ post }) => {
             {isMyPost && (
               <span className="flex justify-end flex-1">
                 <FaTrash
-                  className="cursor-pointer hover:text-red-500"
+                  className="cursor-pointer text-or-website hover:text-red-500"
                   onClick={handleDeletePost}
                 />
               </span>
