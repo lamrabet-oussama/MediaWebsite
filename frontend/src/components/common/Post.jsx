@@ -5,19 +5,43 @@ import { FaRegBookmark } from "react-icons/fa6";
 import { FaTrash } from "react-icons/fa";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import ClipLoader from "react-spinners/ClipLoader";
 const Post = ({ post }) => {
   const [comment, setComment] = useState("");
+  const { data: authUser } = useQuery({ queryKey: ["authUser"] });
+  const queryClient = useQueryClient();
   const postOwner = post.user;
   const isLiked = false;
 
-  const isMyPost = true;
+  const isMyPost = authUser.user._id === post.user._id;
 
   const formattedDate = "1h";
 
   const isCommenting = false;
-
-  const handleDeletePost = () => {};
+  const { mutate: deletePost, isPending } = useMutation({
+    mutationFn: async () => {
+      try {
+        const response = await fetch(`/api/posts/delete/${post._id}`, {
+          method: "DELETE",
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || "Something went wrong");
+        }
+      } catch (error) {
+        throw Error(error);
+      }
+    },
+    onSuccess: () => {
+      toast.success("Post deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+  });
+  const handleDeletePost = () => {
+    deletePost();
+  };
 
   const handlePostComment = (e) => {
     e.preventDefault();
@@ -54,6 +78,7 @@ const Post = ({ post }) => {
                   className="cursor-pointer text-or-website hover:text-red-500"
                   onClick={handleDeletePost}
                 />
+                {isPending && <ClipLoader size="5" color="#FAB400" />}
               </span>
             )}
           </div>
