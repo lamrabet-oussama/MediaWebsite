@@ -6,7 +6,7 @@ const RightPanel = () => {
   const isLoading = true;
 
   return (
-    <div className="hidden fixed w-[20rem] right-0 top-0 lg:block my-4 mx-2">
+    <div className="hidden fixed w-[23rem] right-0 top-0 lg:block my-4 mx-2">
       <div className="border border-[#FAB400] rounded-md text-[#FAB400] p-4 rounded-md sticky top-2">
         <p className="font-bold">Who to follow</p>
         <div className="flex flex-col gap-4">

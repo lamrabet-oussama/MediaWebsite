@@ -19,7 +19,6 @@ const SignUpPage = lazy(() => import("./pages/auth/signup/SignUpPage.jsx"));
 const LoginPage = lazy(() => import("./pages/auth/login/LogInPage.jsx"));
 
 function App() {
-  const [count, setCount] = useState(0);
   const {
     data: authUser,
     isLoading,
@@ -31,14 +30,17 @@ function App() {
       try {
         const result = await fetch("/api/auth/me");
         const data = await result.json();
+        if (data.error) return null;
         if (!result.ok) {
           throw new Error(data.error || "Something went wrong");
         }
         return data;
       } catch (error) {
+        console.log(error.message);
         throw new Error(error);
       }
     },
+    retry: false,
   });
   console.log("authUser is here:", authUser);
   if (isLoading) {

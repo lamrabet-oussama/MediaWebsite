@@ -4,9 +4,10 @@ import { IoNotifications } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { BiLogOut } from "react-icons/bi";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 const Sidebar = () => {
+  const queryClient = useQueryClient();
   const { mutate, isPending, isError, error } = useMutation({
     mutationFn: async () => {
       try {
@@ -24,9 +25,10 @@ const Sidebar = () => {
     },
     onSuccess: () => {
       toast.success("Logout successful");
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
     },
   });
-
+  const { data: authUser } = useQuery({ queryKey: ["authUser"] });
   const data = {
     fullName: "John Doe",
     username: "johndoe",
@@ -34,7 +36,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="md:flex-[2_2_0] fixed  w-18 max-w-52 p-1 ">
+    <div className="md:flex-[2_2_0] fixed   p-1 ">
       <div className="sticky top-0 left-0 h-screen flex flex-col border-r border-[#FAB400] w-20 md:w-full">
         <Link to="/" className="flex justify-center md:justify-start">
           <img width="30" src={icon} alt="logo" />
@@ -61,7 +63,7 @@ const Sidebar = () => {
 
           <li className="flex justify-center md:justify-start">
             <Link
-              to={`/profile/${data?.username}`}
+              to={`/profile/${authUser?.username}`}
               className="flex gap-3 items-center hover:bg-slate-50 transition-all   w-full duration-300 py-2 pl-2 pr-4  cursor-pointer "
             >
               <FaUser className="w-6 h-6" />
@@ -69,22 +71,26 @@ const Sidebar = () => {
             </Link>
           </li>
         </ul>
-        {data && (
+        {authUser && (
           <Link
-            to={`/profile/${data.username}`}
+            to={`/profile/${authUser.user.username}`}
             className="mt-auto mb-10  gap-2  transition-all duration-300 border border-[#FAB400] py-2 px-4 rounded-full flex items-center"
           >
             <div className="avatar hidden md:inline-flex">
               <div className="w-8 rounded-full">
-                <img src={data?.profileImg || "/avatar-placeholder.png"} />
+                <img
+                  src={authUser?.user.profileImg || "/avatar-placeholder.png"}
+                />
               </div>
             </div>
             <div className="flex justify-between flex-1">
               <div className="hidden md:block">
-                <p className="text-[#FAB400] font-bold text-sm w-20 truncate">
-                  {data?.fullName}
+                <p className="text-[#FAB400] font-bold text-sm  ">
+                  {authUser?.user.fullName}
                 </p>
-                <p className="text-gray-500 text-sm">@{data?.username}</p>
+                <p className="text-gray-500 text-sm">
+                  @{authUser?.user.username}
+                </p>
               </div>
             </div>
             <BiLogOut

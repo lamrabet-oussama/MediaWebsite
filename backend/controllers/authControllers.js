@@ -123,6 +123,7 @@ export const getMe = async (req, res) => {
       user,
     });
   } catch (error) {
+    console.log(error);
     res.status(401).json({
       error: "Error in getMe",
       message: "Unauthorized",

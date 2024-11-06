@@ -14,7 +14,7 @@ import * as Yup from "yup";
 import LoginInput from "../../../components/LoginInput";
 
 import ClipLoader from "react-spinners/ClipLoader";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 export default function SignUpPage() {
@@ -54,6 +54,7 @@ export default function SignUpPage() {
   //     // Vous pouvez rediriger l'utilisateur ou afficher un message de succès ici
   //   },
   // });
+  const queryClient = useQueryClient();
   const { mutate, isError, isPending, error } = useMutation({
     mutationFn: async (signupData) => {
       try {
@@ -81,7 +82,7 @@ export default function SignUpPage() {
     },
     onSuccess: (data) => {
       toast.success("Signup successful");
-      console.log("Signup successful:", data);
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
     },
   });
 

@@ -5,7 +5,7 @@ import shape1 from "../../../assets/shape1.svg";
 import axios from "axios";
 import ClipLoader from "react-spinners/ClipLoader";
 import { Link } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 //import { useDispatch } from "react-redux";
 //import Cookies from "js-cookie";
@@ -22,6 +22,7 @@ export default function LoginPage() {
     email: "",
     password: "",
   };
+  const queryClient = useQueryClient();
   const { mutate, isError, isPending, error } = useMutation({
     mutationFn: async (loginData) => {
       try {
@@ -47,11 +48,12 @@ export default function LoginPage() {
     },
     onError: (error) => {
       console.error("Login failed:", error.message);
-      toast.error(error.message);
+      toast.error(error);
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
     },
     onSuccess: (data) => {
       toast.success("Login successful");
-      console.log("Login successful:", data);
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
     },
   });
   const [login, setLogin] = useState(loginInfos);
