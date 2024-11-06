@@ -71,11 +71,11 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { username, password } = req.body;
-    const checkUser = await User.findOne({ username });
+    const { email, password } = req.body;
+    const checkUser = await User.findOne({ email });
     if (!checkUser) {
       return res.status(400).json({
-        error: "User doesn't exist",
+        error: "Email doesn't exist",
       });
     }
 
@@ -123,9 +123,9 @@ export const getMe = async (req, res) => {
       user,
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(401).json({
       error: "Error in getMe",
-      message: error.message,
+      message: "Unauthorized",
       stack: error.stack,
     });
   }

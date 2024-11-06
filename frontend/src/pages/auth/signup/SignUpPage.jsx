@@ -1,12 +1,10 @@
 import React from "react";
 //import { useDispatch } from "react-redux";
 //import Cookies from "js-cookie";
-import { useNavigate } from "react-router-dom";
 import icon from "../../../assets/icon.png";
 import shape2 from "../../../assets/shape2.svg";
 import shape1 from "../../../assets/shape1.svg";
 import "./register.css";
-import axios from "axios";
 import { useState } from "react";
 import { FaRegQuestionCircle } from "react-icons/fa";
 import { motion } from "framer-motion";
@@ -16,6 +14,8 @@ import * as Yup from "yup";
 import LoginInput from "../../../components/LoginInput";
 
 import ClipLoader from "react-spinners/ClipLoader";
+import { useMutation } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 export default function SignUpPage() {
   //const navigate = useNavigate();
@@ -30,6 +30,7 @@ export default function SignUpPage() {
     // lastName: "",
     // gender: "",
   };
+
   const [signup, setSignup] = useState(SignupInfos);
   const {
     email,
@@ -42,6 +43,48 @@ export default function SignUpPage() {
     birthYear,
     // gender,
   } = signup;
+  // const { mutate, isError, isPending, error } = useMutation({
+  //   mutationFn: async (signupData) => await axios.post("/api/auth/signup", signupData)
+  //   ,
+  //   onError: (error) => {
+  //     alert("Signup failed:", error.message);
+  //   },
+  //   onSuccess: (data) => {
+  //     console.log("Signup successful:", data);
+  //     // Vous pouvez rediriger l'utilisateur ou afficher un message de succès ici
+  //   },
+  // });
+  const { mutate, isError, isPending, error } = useMutation({
+    mutationFn: async (signupData) => {
+      try {
+        const response = await fetch("/api/auth/signup", {
+          method: "POST",
+
+          body: JSON.stringify(signupData),
+        });
+
+        if (!response.ok) {
+          const data = await response.json();
+          if (data.error)
+            throw new Error(data.error || "Failed to create account");
+          return data;
+        }
+        return response.json();
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
+    },
+    onError: (error) => {
+      console.error("Signup failed:", error.message);
+      toast.error(error.message);
+    },
+    onSuccess: (data) => {
+      toast.success("Signup successful");
+      console.log("Signup successful:", data);
+    },
+  });
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setSignup({ ...signup, [name]: value });
@@ -64,7 +107,7 @@ export default function SignUpPage() {
       .email("email is invalid."),
     fullName: Yup.string()
       .required("Full Name is required!")
-      .min(7, "First name must be between 2 and 10 caracters.")
+      .min(7, "First name must be between 7 and 10 caracters.")
       .max(20, "First name must be between 2 and 10 caracters.")
       .matches(
         /^[aA-zZ\s]+$/,
@@ -109,47 +152,17 @@ export default function SignUpPage() {
     setShowPassword(!showPassword);
   };
 
-  const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState("");
-  const [success, setSuccess] = useState("");
-  // const dispatch = useDispatch();
-
   const registerSubmit = async () => {
-    try {
-      console.log({
-        email,
-        fullName,
-        // lastName,
-        password,
-        username,
-        birthDay,
-        birthMonth,
-        birthYear,
-        // gender,
-      });
-      const { data } = await axios.post(
-        `http://localhost:5000/api/auth/signup`,
-        {
-          email,
-          fullName,
-          // lastName,
-          password,
-          username,
-          birthDay,
-          birthMonth,
-          birthYear,
-          // gender,
-        }
-      );
-      setErr("");
-      setSuccess(data.message);
-      console.log("data:", data);
-      //  const { message, ...rest } = data;
-    } catch (error) {
-      setLoading(false);
-      setErr(error.response.data.message);
-      setSuccess("");
-    }
+    const signupData = {
+      email,
+      fullName,
+      password,
+      username,
+      birthDay: String(birthDay),
+      birthMonth: String(birthMonth),
+      birthYear: String(birthYear),
+    };
+    mutate(signupData);
   };
 
   return (
@@ -182,9 +195,10 @@ export default function SignUpPage() {
               />
             </div>
 
-            <h2 className="font-bold text-3xl text-center p-3  ml-28 mr-20  mb-5">
+            <h2 className="font-bold text-xl lg:text-3xl text-center p-3  ml-28 mr-20  mb-5">
               Sign Up
             </h2>
+
             <Formik
               enableReinitialize
               initialValues={{
@@ -202,7 +216,7 @@ export default function SignUpPage() {
               validationSchema={SignupValidation}
             >
               {(formik) => (
-                <Form className=" signup-form flex  flex-col   mt-24  ">
+                <Form className=" signup-form flex  flex-col   mt-20  ">
                   <div className=" grid grid-cols-1 grid-rows-1  gap-6">
                     <div>
                       <LoginInput
@@ -363,31 +377,33 @@ export default function SignUpPage() {
                     className="rounded-lg font-bold uppercase p-1 mt-7 bg-[#FFC122]   "
                     type="submit"
                   >
-                    Sign Up
+                    {isPending ? "Loading..." : "Sign up"}
                   </button>
                   <Link to="/login">
                     <div
-                      className="rounded-lg border-2 text-center font-bold uppercase p-1 mt-7 text-[#FFC122] hover:bg-[#FFC122] transition-all active:scale-90 hover:text-black  "
+                      className="rounded-lg border-2 text-center font-bold uppercase p-1 mt-5 text-[#FFC122] hover:bg-[#FFC122] transition-all active:scale-90 hover:text-black  "
                       type="submit"
                     >
                       Sign In
+                    </div>
+                    <div className="text-center mt-5 text-orange-700">
+                      {isError && <p> {error.message} </p>}
+                    </div>
+                    <div className="text-center p-2 ">
+                      {isPending && (
+                        <ClipLoader
+                          color="#FAB400"
+                          size={50}
+                          aria-label="Loading Spinner"
+                          data-testid="loader"
+                        />
+                      )}
                     </div>
                   </Link>
                 </Form>
               )}
             </Formik>
           </div>
-          <div>{err}</div>
-          <div>{success}</div>
-          {loading && (
-            <ClipLoader
-              color="#FAB400"
-              loading={loading}
-              size={150}
-              aria-label="Loading Spinner"
-              data-testid="loader"
-            />
-          )}
         </div>
       </div>
     </div>

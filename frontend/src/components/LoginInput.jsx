@@ -102,7 +102,6 @@ export default function LoginInput({
             )}
           </button>
         )}
-        {console.log(showPassword)}
         {check && (
           <MdError
             className={`absolute  right-0 ${

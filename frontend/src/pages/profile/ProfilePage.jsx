@@ -21,7 +21,7 @@ export default function ProfilePage() {
   const profileImgRef = useRef(null);
 
   const isLoading = false;
-  const isMyProfile = true;
+  const isMyProfile = false;
 
   const user = {
     _id: "1",
@@ -124,7 +124,7 @@ export default function ProfilePage() {
                 {isMyProfile && <EditProfileModal />}
                 {!isMyProfile && (
                   <button
-                    className="btn btn-outline rounded-full btn-sm"
+                    className="btn text-or-website btn-outline rounded-full btn-sm"
                     onClick={() => alert("Followed successfully")}
                   >
                     Follow

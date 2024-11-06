@@ -4,6 +4,9 @@ import shape2 from "../../../assets/shape2.svg";
 import shape1 from "../../../assets/shape1.svg";
 import axios from "axios";
 import ClipLoader from "react-spinners/ClipLoader";
+import { Link } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 //import { useDispatch } from "react-redux";
 //import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +22,38 @@ export default function LoginPage() {
     email: "",
     password: "",
   };
+  const { mutate, isError, isPending, error } = useMutation({
+    mutationFn: async (loginData) => {
+      try {
+        const response = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(loginData),
+        });
+
+        if (!response.ok) {
+          const data = await response.json();
+          if (data.error)
+            throw new Error(data.error || "Failed to create account");
+          return data;
+        }
+        return response.json();
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
+    },
+    onError: (error) => {
+      console.error("Login failed:", error.message);
+      toast.error(error.message);
+    },
+    onSuccess: (data) => {
+      toast.success("Login successful");
+      console.log("Login successful:", data);
+    },
+  });
   const [login, setLogin] = useState(loginInfos);
   const { email, password } = login;
   const handleChange = (e) => {
@@ -34,9 +69,6 @@ export default function LoginPage() {
     password: Yup.string().required("Password is required"),
   });
 
-  const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState("");
-  const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const togglePasswordVisibility = (showPassword) => {
     setShowPassword(!showPassword);
@@ -44,21 +76,12 @@ export default function LoginPage() {
   // const dispatch = useDispatch();
   // const navigate = useNavigate();
   const loginSubmit = async () => {
-    try {
-      const { data } = await axios.post(
-        `http://localhost:5000/api/auth/login`,
-        {
-          email,
-          password,
-        }
-      );
-      setErr("");
-      setSuccess(data.message);
-    } catch (error) {
-      setLoading(false);
-      setErr(error.response.data.message);
-      setSuccess("");
-    }
+    const loginData = {
+      email,
+      password,
+    };
+
+    mutate(loginData);
   };
 
   return (
@@ -137,8 +160,25 @@ export default function LoginPage() {
                   className="rounded-lg font-bold uppercase p-1 mt-7 bg-[#FFC122]   "
                   type="submit"
                 >
-                  LogIn
+                  {isPending ? "Loading..." : "LOG IN"}
                 </button>
+                <Link
+                  className="rounded-lg hover:bg-stone-100 text-center font-bold uppercase p-1 mt-7 text-[#FFC122] border-or-website border active:bg-or-website active:text-white "
+                  to="/signup"
+                >
+                  SIGN UP
+                </Link>
+
+                <div className="text-center p-2 ">
+                  {isPending && (
+                    <ClipLoader
+                      color="#FAB400"
+                      size={50}
+                      aria-label="Loading Spinner"
+                      data-testid="loader"
+                    />
+                  )}
+                </div>
               </Form>
             )}
           </Formik>
@@ -146,8 +186,9 @@ export default function LoginPage() {
           {/*Sign up */}
           <div></div>
 
-          {err && <div>{err}</div>}
-          {success && <div>{success}</div>}
+          {isError && (
+            <div className="text-or-website text-center">{error.message}</div>
+          )}
         </div>
         {/* <Link to="/">
           <strong>Create a page</strong> for a celebrate,brand or buiseness

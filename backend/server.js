@@ -7,7 +7,7 @@ import helmet from "helmet";
 import mongoSanitize from "express-mongo-sanitize";
 import xss from "xss-clean";
 import hpp from "hpp"; // Ajout de hpp pour prévenir la pollution des paramètres
-
+import cors from "cors";
 import connectDB from "./db/connectDB.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
@@ -26,36 +26,38 @@ cloudinary.config({
 });
 
 // Middlewares de sécurité
-app.use(helmet()); // Sécuriser les en-têtes HTTP
-app.use(
-  rateLimit({
-    max: 100,
-    windowMs: 60 * 60 * 1000, // Limite : 100 requêtes par heure
-    message: "Too many requests from this IP, please try again in an hour!",
-  })
-);
-app.use(express.json({ limit: "10kb" })); // Limiter la taille des requêtes
-app.use(express.urlencoded({ extended: true })); // Analyser les données URL-encoded
-app.use(cookieParser()); // Analyser les cookies
+// app.use(helmet()); // Sécuriser les en-têtes HTTP
+// app.use(
+//   rateLimit({
+//     max: 100,
+//     windowMs: 60 * 60 * 1000, // Limite : 100 requêtes par heure
+//     message: "Too many requests from this IP, please try again in an hour!",
+//   })
+// );
+// app.use(express.json({ limit: "10kb" })); // Limiter la taille des requêtes
+// app.use(express.urlencoded({ extended: true })); // Analyser les données URL-encoded
+// app.use(cookieParser()); // Analyser les cookies
 
-// Assainissement des données
-app.use(mongoSanitize()); // Prévenir les injections MongoDB
-app.use(xss()); // Protéger contre les attaques XSS
+// // Assainissement des données
+// app.use(mongoSanitize()); // Prévenir les injections MongoDB
+// app.use(xss()); // Protéger contre les attaques XSS
 
-// Prévenir la pollution des paramètres
-app.use(
-  hpp({
-    whitelist: [
-      "duration",
-      "ratingsQuantity",
-      "ratingsAverage",
-      "maxGroupSize",
-      "difficulty",
-      "price",
-    ],
-  })
-);
+// // Prévenir la pollution des paramètres
+// app.use(
+//   hpp({
+//     whitelist: [
+//       "duration",
+//       "ratingsQuantity",
+//       "ratingsAverage",
+//       "maxGroupSize",
+//       "difficulty",
+//       "price",
+//     ],
+//   })
+// );
+app.use(cors({ origin: "http://localhost:3000" }));
 
+app.use(express.json());
 // Routes de l'application
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
