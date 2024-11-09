@@ -12,9 +12,9 @@ import {
   getUserPosts,
 } from "../controllers/postControllers.js";
 router.get("/all", protectRoute, getAllPosts);
-router.get("/likes/:id", protectRoute, getLikesPosts);
+router.get("/likes/:username", protectRoute, getLikesPosts);
 router.get("/following/", protectRoute, getFollowingPosts);
-router.get("/user/:id", protectRoute, getUserPosts);
+router.get("/:username", protectRoute, getUserPosts);
 router.post("/create", protectRoute, createPost);
 router.post("/like/:id", protectRoute, likeUnlikePost);
 router.post("/comment/:id", protectRoute, commentOnPost);

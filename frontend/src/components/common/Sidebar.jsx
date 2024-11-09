@@ -29,7 +29,6 @@ const Sidebar = () => {
     },
   });
   const { data: authUser } = useQuery({ queryKey: ["authUser"] });
-
   return (
     <div className="md:flex-[2_2_0] fixed   p-1 ">
       <div className="sticky top-0 left-0 h-screen flex flex-col border-r border-[#FAB400] w-20 md:w-full">
@@ -68,24 +67,20 @@ const Sidebar = () => {
         </ul>
         {authUser && (
           <Link
-            to={`/profile/${authUser.user.username}`}
+            to={`/profile/${authUser?.username}`}
             className="mt-auto mb-10  gap-2  transition-all duration-300 border border-[#FAB400] py-2 px-4 rounded-full flex items-center"
           >
             <div className="avatar hidden md:inline-flex">
               <div className="w-8 rounded-full">
-                <img
-                  src={authUser?.user.profileImg || "/avatar-placeholder.png"}
-                />
+                <img src={authUser?.profileImg || "/avatar-placeholder.png"} />
               </div>
             </div>
             <div className="flex justify-between flex-1">
               <div className="hidden md:block">
                 <p className="text-[#FAB400] font-bold text-sm  ">
-                  {authUser?.user.fullName}
+                  {authUser?.fullName}
                 </p>
-                <p className="text-gray-500 text-sm">
-                  @{authUser?.user.username}
-                </p>
+                <p className="text-gray-500 text-sm">@{authUser?.username}</p>
               </div>
             </div>
             <BiLogOut

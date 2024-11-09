@@ -16,10 +16,8 @@ export const getNotification = async (req, res) => {
       select: "username profileImg",
     });
     await Notification.updateMany({ to: user._id }, { read: true });
-
-    return res.status(200).json({
-      notification,
-    });
+    console.log("notif:", notification);
+    return res.status(200).json(notification);
   } catch (error) {
     return res.status(500).json({
       message: "Error in getNotification",

@@ -62,7 +62,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
-app.use("/api/notification", notificationRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // Lancement du serveur
 const PORT = process.env.PORT || 5000;

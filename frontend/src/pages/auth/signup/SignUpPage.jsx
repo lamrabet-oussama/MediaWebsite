@@ -1,6 +1,6 @@
 import React from "react";
-//import { useDispatch } from "react-redux";
-//import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
+
 import icon from "../../../assets/icon.png";
 import shape2 from "../../../assets/shape2.svg";
 import shape1 from "../../../assets/shape1.svg";
@@ -18,7 +18,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 export default function SignUpPage() {
-  //const navigate = useNavigate();
+  const navigate = useNavigate();
   const SignupInfos = {
     email: "",
     password: "",
@@ -60,29 +60,32 @@ export default function SignUpPage() {
       try {
         const response = await fetch("/api/auth/signup", {
           method: "POST",
-
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify(signupData),
         });
 
         if (!response.ok) {
           const data = await response.json();
+          console.log(data);
           if (data.error)
             throw new Error(data.error || "Failed to create account");
           return data;
         }
         return response.json();
       } catch (error) {
-        console.error(error);
-        throw error;
+        throw new Error(error.message);
       }
     },
     onError: (error) => {
-      console.error("Signup failed:", error.message);
+      console.error("Signup failed:", error.stack);
       toast.error(error.message);
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success("Signup successful");
       queryClient.invalidateQueries({ queryKey: ["authUser"] });
+      navigate("/");
     },
   });
 
@@ -105,7 +108,7 @@ export default function SignUpPage() {
   const SignupValidation = Yup.object({
     email: Yup.string()
       .required("Email address is required.")
-      .email("email is invalid."),
+      .matches(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/, "Email is invalid."),
     fullName: Yup.string()
       .required("Full Name is required!")
       .min(7, "First name must be between 7 and 10 caracters.")

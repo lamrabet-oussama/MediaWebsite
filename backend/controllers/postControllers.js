@@ -206,8 +206,8 @@ export const getAllPosts = async (req, res) => {
 
 export const getLikesPosts = async (req, res) => {
   try {
-    const userId = req.params.id;
-    const user = await User.findById(userId);
+    const username = req.params.username;
+    const user = await User.findOne({ username });
     if (!user) {
       return res.status(404).json({
         error: "User not found",
@@ -264,7 +264,8 @@ export const getFollowingPosts = async (req, res) => {
 
 export const getUserPosts = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
+    const username = req.params.username;
+    const user = await User.findOne({ username });
     if (!user) {
       return res.status(404).json({
         error: "User not found",

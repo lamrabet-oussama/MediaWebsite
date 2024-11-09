@@ -29,12 +29,12 @@ const Post = ({ post }) => {
   const { data: authUser } = useQuery({ queryKey: ["authUser"] });
   const queryClient = useQueryClient();
   const postOwner = post.user;
-  const isLiked = post.likes.includes(authUser.user._id);
+  const isLiked = post.likes.includes(authUser._id);
   const [isMuted, setIsMuted] = useState(false);
   const toggleMute = () => {
     setIsMuted(!isMuted);
   };
-  const isMyPost = authUser.user._id === post.user._id;
+  const isMyPost = authUser._id === post.user._id;
 
   const formattedDate = formatPostDate(post.createdAt);
 

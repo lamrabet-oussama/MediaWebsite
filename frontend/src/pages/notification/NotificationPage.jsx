@@ -1,40 +1,51 @@
 import { Link } from "react-router-dom";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
-
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa6";
 import "./style.css";
+import toast from "react-hot-toast";
 const NotificationPage = () => {
-  const isLoading = false;
-  const notifications = [
-    {
-      _id: "1",
-      from: {
-        _id: "1",
-        username: "johndoe",
-        profileImg: "/avatars/boy2.png",
-      },
-      type: "follow",
+  const queryClient = useQueryClient();
+  const { data: notifications, isLoading } = useQuery({
+    queryKey: ["notifications"],
+    queryFn: async () => {
+      try {
+        const res = await fetch("/api/notifications");
+        const data = await res.json();
+        console.log(data);
+        if (!res.ok) {
+          throw new Error(data.erro || "Something went wrong");
+        }
+        return data;
+      } catch (error) {
+        throw new Error(error.message);
+      }
     },
-    {
-      _id: "2",
-      from: {
-        _id: "2",
-        username: "janedoe",
-        profileImg: "/avatars/girl1.png",
-      },
-      type: "like",
+  });
+  const { mutate: deleteNotifications } = useMutation({
+    mutationFn: async () => {
+      try {
+        const res = await fetch("/api/notifications", {
+          method: "DELETE",
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Something went wrong");
+        return data;
+      } catch (error) {
+        throw new Error(error.message);
+      }
     },
-  ];
-
-  const deleteNotifications = () => {
-    alert("All notifications deleted");
-  };
+    onSuccess: () => {
+      toast.success("Notifications deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+  });
 
   return (
     <>
-      <div className="flex-[4_4_0] border-l w-1/2 m-auto border-r border-[#FAB400] min-h-screen">
+      <div className="flex-[4_4_0]  w-[60%] ml-[13rem] m-auto border-r border-[#FAB400] min-h-screen">
         <div className="flex justify-between text-[#FAB400] items-center p-4 border-b border-[#FAB400]">
           <p className="font-bold">Notifications</p>
           <div className="dropdown ">
@@ -43,10 +54,15 @@ const NotificationPage = () => {
             </div>
             <ul
               tabIndex={0}
-              className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52  "
+              className="dropdown-content z-[1]  p-4  shadow bg-base-100 rounded-box w-52  "
             >
-              <li className="  focus:bg-or-website  ">
-                <a onClick={deleteNotifications}>Delete all notifications</a>
+              <li className="  focus:bg-stone-300   ">
+                <a
+                  className="bg-white cursor-pointer "
+                  onClick={deleteNotifications}
+                >
+                  Delete all notifications
+                </a>
               </li>
             </ul>
           </div>
@@ -85,7 +101,7 @@ const NotificationPage = () => {
                 <div className="flex gap-1">
                   <span className="font-bold">
                     @{notification.from.username}
-                  </span>{" "}
+                  </span>
                   {notification.type === "follow"
                     ? "followed you"
                     : "liked your post"}
