@@ -8,6 +8,8 @@ import { Link } from "react-router-dom";
 import "./video.css";
 import { MdVolumeUp } from "react-icons/md";
 import { MdVolumeOff } from "react-icons/md";
+import { FaHeart } from "react-icons/fa6";
+import { motion } from "framer-motion";
 import {
   Player,
   ControlBar,
@@ -26,7 +28,7 @@ const Post = ({ post }) => {
   const { data: authUser } = useQuery({ queryKey: ["authUser"] });
   const queryClient = useQueryClient();
   const postOwner = post.user;
-  const isLiked = false;
+  const isLiked = post.likes.includes(authUser.user._id);
   const [isMuted, setIsMuted] = useState(false);
   const toggleMute = () => {
     setIsMuted(!isMuted);
@@ -35,8 +37,8 @@ const Post = ({ post }) => {
 
   const formattedDate = "1h";
 
-  const isCommenting = false;
-  const { mutate: deletePost, isPending } = useMutation({
+  const isCommenting = true;
+  const { mutate: deletePost, isPending: isDeleting } = useMutation({
     mutationFn: async () => {
       try {
         const response = await fetch(`/api/posts/delete/${post._id}`, {
@@ -55,6 +57,36 @@ const Post = ({ post }) => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
   });
+  const { mutate: likePost, isPending: isLiking } = useMutation({
+    mutationFn: async () => {
+      try {
+        const res = await fetch(`/api/posts/like/${post._id}`, {
+          method: "POST",
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || "Something went wrong");
+        }
+        return data;
+      } catch (error) {
+        throw new Error(error.message);
+      }
+    },
+    onSuccess: (updatedLikes) => {
+      //queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.setQueryData(["posts"], (oldData) => {
+        return oldData.map((p) => {
+          if (p._id === post._id) {
+            return { ...p, likes: updatedLikes };
+          }
+          return p;
+        });
+      });
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
   const handleDeletePost = () => {
     deletePost();
   };
@@ -63,7 +95,10 @@ const Post = ({ post }) => {
     e.preventDefault();
   };
 
-  const handleLikePost = () => {};
+  const handleLikePost = () => {
+    if (isLiking) return;
+    likePost();
+  };
 
   return (
     <>
@@ -90,11 +125,14 @@ const Post = ({ post }) => {
             </span>
             {isMyPost && (
               <span className="flex justify-end flex-1">
-                <FaTrash
-                  className="cursor-pointer text-or-website hover:text-red-500"
-                  onClick={handleDeletePost}
-                />
-                {isPending && <ClipLoader size="5" color="#FAB400" />}
+                {isDeleting ? (
+                  <ClipLoader size="10" color="#FAB400" />
+                ) : (
+                  <FaTrash
+                    className="cursor-pointer text-or-website hover:text-red-500"
+                    onClick={handleDeletePost}
+                  />
+                )}
               </span>
             )}
           </div>
@@ -191,14 +229,14 @@ const Post = ({ post }) => {
                     onSubmit={handlePostComment}
                   >
                     <textarea
-                      className="textarea w-full p-1 rounded text-md resize-none border focus:outline-none  border-gray-800"
+                      className="textarea w-full p-1 rounded text-md resize-none border focus:outline-none focus:border-or-website  border-gray-800"
                       placeholder="Add a comment..."
                       value={comment}
                       onChange={(e) => setComment(e.target.value)}
                     />
-                    <button className="btn btn-primary rounded-full btn-sm text-white px-4">
+                    <button className="btn bg-or-website rounded-full btn-sm text-white px-4">
                       {isCommenting ? (
-                        <span className="loading loading-spinner loading-md"></span>
+                        <ClipLoader color="#FFF" size="20" />
                       ) : (
                         "Post"
                       )}
@@ -219,16 +257,29 @@ const Post = ({ post }) => {
                 className="flex gap-1 items-center group cursor-pointer"
                 onClick={handleLikePost}
               >
-                {!isLiked && (
-                  <FaRegHeart className="w-4 h-4 cursor-pointer text-slate-500 group-hover:text-pink-500" />
+                {isLiking && <ClipLoader color="#FAB400" size="20" />}
+                {!isLiked && !isLiking && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                  >
+                    <FaRegHeart className="w-4 h-4 cursor-pointer text-slate-500 group-hover:text-pink-500" />
+                  </motion.div>
                 )}
-                {isLiked && (
-                  <FaRegHeart className="w-4 h-4 cursor-pointer text-pink-500 " />
+                {isLiked && !isLiking && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                  >
+                    <FaHeart className="w-4 h-4 cursor-pointer text-red-600 " />
+                  </motion.div>
                 )}
 
                 <span
                   className={`text-sm text-slate-500 group-hover:text-pink-500 ${
-                    isLiked ? "text-pink-500" : ""
+                    isLiked ? "text-red-600" : ""
                   }`}
                 >
                   {post.likes.length}
