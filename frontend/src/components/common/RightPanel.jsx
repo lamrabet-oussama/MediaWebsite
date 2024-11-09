@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import RightPanelSkeleton from "../skeletons/RightPanelSkeleton";
-import { USERS_FOR_RIGHT_PANEL } from "../../utils/db/dummy";
+
 import { useQuery } from "@tanstack/react-query";
+import ClipLoader from "react-spinners/ClipLoader";
+import useFollow from "../../hooks/useFollow";
 const RightPanel = () => {
   const { data: suggestedUsers, isLoading } = useQuery({
     queryKey: ["suggestedUsers"],
@@ -18,8 +20,8 @@ const RightPanel = () => {
       }
     },
   });
-  if (suggestedUsers.suggestedUsers?.length === 0)
-    return <div className="md:w-64 w-0"></div>;
+  const { follow, isPending } = useFollow();
+  if (suggestedUsers?.length === 0) return <div className="md:w-64 w-0"></div>;
   return (
     <div className="hidden fixed w-[23rem] right-0 top-0 lg:block my-4 mx-2">
       <div className="border border-[#FAB400] rounded-md text-[#FAB400] p-4  sticky top-2">
@@ -59,9 +61,16 @@ const RightPanel = () => {
                 <div>
                   <button
                     className="btn border-[#FAB400] bg-white text-[#FAB400] hover:text-white hover:bg-[#FAB400] rounded-full btn-sm"
-                    onClick={(e) => e.preventDefault()}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      follow(user?._id);
+                    }}
                   >
-                    Follow
+                    {isPending ? (
+                      <ClipLoader color="#FAB400" size="20" />
+                    ) : (
+                      "Follow"
+                    )}
                   </button>
                 </div>
               </Link>

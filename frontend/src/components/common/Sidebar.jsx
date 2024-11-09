@@ -29,11 +29,6 @@ const Sidebar = () => {
     },
   });
   const { data: authUser } = useQuery({ queryKey: ["authUser"] });
-  const data = {
-    fullName: "John Doe",
-    username: "johndoe",
-    profileImg: "/avatars/boy1.png",
-  };
 
   return (
     <div className="md:flex-[2_2_0] fixed   p-1 ">
