@@ -34,7 +34,7 @@ app.use(
     message: "Too many requests from this IP, please try again in an hour!",
   })
 );
-app.use(express.json({ limit: "10kb" })); // Limiter la taille des requêtes
+app.use(express.json({ limit: "5mb" })); // Limiter la taille des requêtes
 app.use(express.urlencoded({ extended: true })); // Analyser les données URL-encoded
 app.use(cookieParser()); // Analyser les cookies
 

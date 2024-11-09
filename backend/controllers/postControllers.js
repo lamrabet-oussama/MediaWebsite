@@ -5,33 +5,56 @@ import { v2 as cloudinary } from "cloudinary";
 export const createPost = async (req, res) => {
   try {
     const { text } = req.body;
-    let { img } = req.body;
+    let { img, video } = req.body;
     const userId = req.user._id.toString();
     const user = await User.findById(userId);
+
     if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
+      return res.status(404).json({ message: "User not found" });
     }
-    if (!text && !img) {
-      return res.status(400).json({
-        error: "A post must have a text and an image!",
-        text: text,
-      });
+
+    if (!text && !img && !video) {
+      return res
+        .status(400)
+        .json({ error: "A post must have text, an image, or a video!" });
     }
+
     if (img) {
-      const uploadResponse = cloudinary.uploader.upload(img);
-      img = (await uploadResponse).secure_url;
+      const uploadResponse = await cloudinary.uploader.upload(img);
+      img = uploadResponse.secure_url;
     }
+
+    if (video) {
+      try {
+        const result = await new Promise((resolve, reject) => {
+          cloudinary.uploader.upload_large(
+            video,
+            { resource_type: "video" },
+            (error, result) => {
+              if (error) return reject(error);
+              resolve(result);
+            }
+          );
+        });
+        video = result.secure_url;
+      } catch (error) {
+        return res
+          .status(500)
+          .json({ error: "Video upload failed", details: error.message });
+      }
+    }
+
     const newPost = new Post({
       user: userId,
       text,
       img,
+      video,
     });
+
     await newPost.save();
     res.status(201).json(newPost);
   } catch (error) {
-    return res.status(500).json({
+    res.status(500).json({
       message: "Error in createPost",
       error: error.message,
       errorStack: error.stack,
@@ -57,6 +80,11 @@ export const deletePost = async (req, res) => {
       const imgId = post.img.split("/").pop().split(".")[0];
       await cloudinary.uploader.destroy(imgId);
     }
+    if (post.video) {
+      const videoId = post.video.split("/").pop().split(".")[0];
+      await cloudinary.uploader.destroy(videoId, { resource_type: "video" });
+    }
+
     await Post.findByIdAndDelete(postId);
 
     res.status(200).json({

@@ -1,10 +1,23 @@
 import { FaRegComment } from "react-icons/fa";
 import { BiRepost } from "react-icons/bi";
 import { FaRegHeart } from "react-icons/fa";
-import { FaRegBookmark } from "react-icons/fa6";
+import { FaRegBookmark } from "react-icons/fa";
 import { FaTrash } from "react-icons/fa";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import "./video.css";
+import { MdVolumeUp } from "react-icons/md";
+import { MdVolumeOff } from "react-icons/md";
+import {
+  Player,
+  ControlBar,
+  PlayToggle,
+  VolumeMenuButton,
+  CurrentTimeDisplay,
+  TimeDivider,
+  DurationDisplay,
+} from "video-react";
+import "video-react/dist/video-react.css";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import ClipLoader from "react-spinners/ClipLoader";
@@ -14,7 +27,10 @@ const Post = ({ post }) => {
   const queryClient = useQueryClient();
   const postOwner = post.user;
   const isLiked = false;
-
+  const [isMuted, setIsMuted] = useState(false);
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+  };
   const isMyPost = authUser.user._id === post.user._id;
 
   const formattedDate = "1h";
@@ -90,6 +106,30 @@ const Post = ({ post }) => {
                 className="h-80 object-contain rounded-lg border border-gray-700"
                 alt=""
               />
+            )}
+            {post.video && (
+              <div>
+                <Player
+                  className="text-or-website"
+                  src={post.video}
+                  autoPlay
+                  muted={isMuted}
+                >
+                  <ControlBar className="text-or-website " autoHide={false}>
+                    <PlayToggle className="text-or-website" />
+                    <VolumeMenuButton className="text-or-website" vertical />
+                    <CurrentTimeDisplay className="text-or-website" />
+                    <TimeDivider className="text-or-website" />
+                    <DurationDisplay className="text-or-website" />
+                  </ControlBar>
+                </Player>
+                <button
+                  onClick={toggleMute}
+                  className="mt-2 p-2 bg-or-website text-white rounded"
+                >
+                  {isMuted ? <MdVolumeOff /> : <MdVolumeUp />}
+                </button>
+              </div>
             )}
           </div>
           <div className="flex justify-between mt-3">
