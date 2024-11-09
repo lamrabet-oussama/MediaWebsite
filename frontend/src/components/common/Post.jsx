@@ -10,6 +10,7 @@ import { MdVolumeUp } from "react-icons/md";
 import { MdVolumeOff } from "react-icons/md";
 import { FaHeart } from "react-icons/fa6";
 import { motion } from "framer-motion";
+import { formatPostDate } from "../../utils/date";
 import {
   Player,
   ControlBar,
@@ -35,9 +36,8 @@ const Post = ({ post }) => {
   };
   const isMyPost = authUser.user._id === post.user._id;
 
-  const formattedDate = "1h";
+  const formattedDate = formatPostDate(post.createdAt);
 
-  const isCommenting = true;
   const { mutate: deletePost, isPending: isDeleting } = useMutation({
     mutationFn: async () => {
       try {
@@ -87,12 +87,50 @@ const Post = ({ post }) => {
       toast.error(error.message);
     },
   });
+  const { mutate: commentPost, isPending: isCommenting } = useMutation({
+    mutationFn: async () => {
+      try {
+        const res = await fetch(`/api/posts/comment/${post._id}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ text: comment }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || "Something wen wrong");
+        }
+        return data;
+      } catch (error) {
+        throw new Error(error.message);
+      }
+    },
+    onSuccess: (postComments) => {
+      toast.success("Comment created successfully");
+      setComment("");
+      //queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.setQueryData(["posts"], (oldData) => {
+        return oldData.map((p) => {
+          if (p._id === post._id) {
+            return { ...p, comments: postComments };
+          }
+          return p;
+        });
+      });
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
   const handleDeletePost = () => {
     deletePost();
   };
 
   const handlePostComment = (e) => {
     e.preventDefault();
+    if (isCommenting) return;
+    commentPost();
   };
 
   const handleLikePost = () => {
@@ -234,7 +272,10 @@ const Post = ({ post }) => {
                       value={comment}
                       onChange={(e) => setComment(e.target.value)}
                     />
-                    <button className="btn bg-or-website rounded-full btn-sm text-white px-4">
+                    <button
+                      type="submit"
+                      className="btn bg-or-website rounded-full btn-sm text-white px-4"
+                    >
                       {isCommenting ? (
                         <ClipLoader color="#FFF" size="20" />
                       ) : (

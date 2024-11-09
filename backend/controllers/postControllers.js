@@ -120,9 +120,14 @@ export const commentOnPost = async (req, res) => {
     };
     post.comments.push(comment);
     await post.save();
-    res.status(200).json({
-      message: "Comment added successfully",
+    const notification = new Notification({
+      from: req.user._id.toString(),
+      to: post.user,
+      type: "comment",
     });
+    await notification.save();
+    const postComments = post.comments;
+    res.status(200).json(postComments);
   } catch (error) {
     return res.status(500).json({
       message: "Error in commentOnPost",
