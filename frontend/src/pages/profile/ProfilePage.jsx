@@ -109,8 +109,8 @@ export default function ProfilePage() {
   });
   const { follow, isPending } = useFollow();
   return (
-    <>
-      <div className="!flex-[4_4_0]  ml-[3rem]  m-auto border-r border-[#FAB400] min-h-screen  overflow-x-hidden  flex flex-col     md:w-[60%] md:ml-[15rem] ">
+    <div className="flex justify-center items-center w-[60%] ml-[16rem] ">
+      <div className="!flex-[4_4_0]  ml-[3rem]  m-auto border-r border-[#FAB400] min-h-screen  overflow-x-hidden  flex flex-col     md:w-[50%] ">
         {/* HEADER */}
         {(isLoading || isRefetching) && <ProfileHeaderSkeleton />}
         {!isLoading && !isRefetching && !user && (
@@ -206,7 +206,7 @@ export default function ProfilePage() {
                   </div>
                 </div>
               </div>
-              <div className="flex justify-end px-4 mt-5">
+              <div className="flex justify-end    py-6 md:py-auto  md:px-4  mt-5">
                 {isMyProfile && <EditProfileModal authUser={authUser} />}
                 {!isMyProfile && (
                   <button
@@ -224,7 +224,7 @@ export default function ProfilePage() {
                       isUpdatingProfile
                         ? "border-[#000] bg-black"
                         : "border-[#FAB400] bg-white"
-                    } btn  text-or-website rounded-full btn-sm  px-4 ml-2 btn-outline`}
+                    } btn  text-or-website rounded-full btn-sm  px-4 mr-2 ml-2 btn-outline`}
                     onClick={async () => {
                       await updateProfile({ profileImg, coverImg });
                       setCoverImg(null);
@@ -310,6 +310,6 @@ export default function ProfilePage() {
           <Posts feedType={feedType} username={username} />
         </div>
       </div>
-    </>
+    </div>
   );
 }

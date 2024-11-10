@@ -88,7 +88,7 @@ export const login = async (req, res) => {
     }
     generateTokenAndSetCookie(checkUser._id, res);
     res.status(200).json({
-      message: "Login successful",
+      message: "Login successfully",
       user: {
         checkUser,
       },

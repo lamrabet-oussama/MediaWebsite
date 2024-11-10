@@ -20,7 +20,10 @@ export const createPost = async (req, res) => {
     }
 
     if (img) {
-      const uploadResponse = await cloudinary.uploader.upload(img);
+      const uploadResponse = await cloudinary.uploader.upload(img, {
+        folder: "images_folder",
+        resource_type: "image",
+      });
       img = uploadResponse.secure_url;
     }
 
@@ -29,7 +32,10 @@ export const createPost = async (req, res) => {
         const result = await new Promise((resolve, reject) => {
           cloudinary.uploader.upload_large(
             video,
-            { resource_type: "video" },
+            {
+              folder: "videos_folder", // Spécifie le dossier pour les vidéos
+              resource_type: "video", // Assure que le fichier est traité en tant que vidéo
+            },
             (error, result) => {
               if (error) return reject(error);
               resolve(result);
@@ -66,20 +72,24 @@ export const deletePost = async (req, res) => {
   try {
     const postId = req.params.id;
     const post = await Post.findById(postId);
+
     if (!post) {
-      return es.status(404).json({
+      return res.status(404).json({
         error: "Post not found",
       });
     }
-    if (post.user.toString() != req.user._id.toString()) {
+
+    if (post.user.toString() !== req.user._id.toString()) {
       return res.status(401).json({
         error: "You are not authorized to delete this post",
       });
     }
+
     if (post.img) {
       const imgId = post.img.split("/").pop().split(".")[0];
-      await cloudinary.uploader.destroy(imgId);
+      await cloudinary.uploader.destroy(imgId, { resource_type: "image" });
     }
+
     if (post.video) {
       const videoId = post.video.split("/").pop().split(".")[0];
       await cloudinary.uploader.destroy(videoId, { resource_type: "video" });

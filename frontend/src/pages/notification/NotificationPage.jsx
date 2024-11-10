@@ -46,8 +46,8 @@ const NotificationPage = () => {
   });
 
   return (
-    <>
-      <div className="flex-[4_4_0]    m-auto overflow-x-hidden  border-r  border-[#FAB400] min-h-screen flex flex-col   ml-[3rem]  md:w-[60%] md:ml-[15rem]  ">
+    <div className="flex justify-center items-center w-[60%] ml-[16rem]">
+      <div className="flex-[4_4_0]    m-auto overflow-x-hidden  border-r  border-[#FAB400] min-h-screen flex flex-col   ml-[3rem]  md:w-[50%]   ">
         <div className="flex justify-between text-[#FAB400] items-center p-4 border-b border-[#FAB400]">
           <p className="font-bold">Notifications</p>
           <div className="dropdown">
@@ -90,12 +90,12 @@ const NotificationPage = () => {
               {notification.type === "like" && (
                 <FaHeart className="w-7 h-7 text-red-500" />
               )}
-              <Link to={`/profile/${notification.from.username}`}>
+              <Link to={`/profile/${notification?.from?.username}`}>
                 <div className="avatar">
                   <div className="w-8 rounded-full">
                     <img
                       src={
-                        notification.from.profileImg ||
+                        notification?.from?.profileImg ||
                         "/avatar-placeholder.png"
                       }
                     />
@@ -103,9 +103,9 @@ const NotificationPage = () => {
                 </div>
                 <div className="flex gap-1">
                   <span className="font-bold">
-                    @{notification.from.username}
+                    @{notification?.from?.username}
                   </span>
-                  {notification.type === "follow"
+                  {notification?.type === "follow"
                     ? "followed you"
                     : "liked your post"}
                 </div>
@@ -114,7 +114,7 @@ const NotificationPage = () => {
           </div>
         ))}
       </div>
-    </>
+    </div>
   );
 };
 

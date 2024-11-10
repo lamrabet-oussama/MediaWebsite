@@ -67,7 +67,7 @@ const RightPanel = () => {
                     }}
                   >
                     {isPending ? (
-                      <ClipLoader color="#FAB400" size="20" />
+                      <ClipLoader color="#FFF" size="20" />
                     ) : (
                       "Follow"
                     )}

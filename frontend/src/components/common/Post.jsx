@@ -34,7 +34,12 @@ const Post = ({ post }) => {
   const toggleMute = () => {
     setIsMuted(!isMuted);
   };
-  console.log(post);
+  const [showFullText, setShowFullText] = useState(false);
+  const characterLimit = 600; // Limite de caractères avant d'afficher les points de suspension
+
+  const toggleTextDisplay = () => {
+    setShowFullText(!showFullText);
+  };
   const isMyPost = authUser._id === post.user?._id;
 
   const formattedDate = formatPostDate(post.createdAt);
@@ -181,36 +186,62 @@ const Post = ({ post }) => {
             )}
           </div>
           <div className="flex flex-col gap-3 overflow-hidden">
-            <span>{post.text}</span>
-            {post.img && (
-              <img
-                src={post.img}
-                className="h-80 object-contain rounded-lg border border-gray-700"
-                alt=""
-              />
-            )}
-            {post.video && (
-              <div>
-                <Player
-                  className="text-or-website"
-                  src={post.video}
-                  autoPlay
-                  muted={isMuted}
-                >
-                  <ControlBar className="text-or-website " autoHide={false}>
-                    <PlayToggle className="text-or-website" />
-                    <VolumeMenuButton className="text-or-website" vertical />
-                    <CurrentTimeDisplay className="text-or-website" />
-                    <TimeDivider className="text-or-website" />
-                    <DurationDisplay className="text-or-website" />
-                  </ControlBar>
-                </Player>
+            <span>
+              {showFullText || post?.text.length <= characterLimit
+                ? post?.text
+                : `${post?.text.slice(0, characterLimit)}... `}
+              {post?.text.length > characterLimit && (
                 <button
-                  onClick={toggleMute}
-                  className="mt-2 p-2 bg-or-website text-white rounded"
+                  onClick={toggleTextDisplay}
+                  className="text-blue-500 underline ml-2"
                 >
-                  {isMuted ? <MdVolumeOff /> : <MdVolumeUp />}
+                  {showFullText ? "Show less" : "Show more"}
                 </button>
+              )}
+            </span>
+            {post.img && (
+              <div className="flex justify-center">
+                <div className="w-[500px] text-center">
+                  <a href={post.img} target="_blank" rel="noopener noreferrer">
+                    <img
+                      src={post.img}
+                      className="object-contain rounded-lg border w-[500px] border-gray-700"
+                      alt="Post image"
+                    />
+                  </a>
+                </div>
+              </div>
+            )}
+
+            {post.video && (
+              <div className="flex justify-center">
+                <div className="w-[800px]">
+                  <div>
+                    <Player
+                      className="text-or-website"
+                      src={post.video}
+                      muted={isMuted}
+                      autoPlay={false}
+                    >
+                      <ControlBar className="text-or-website " autoHide={false}>
+                        <PlayToggle className="text-or-website" />
+                        <VolumeMenuButton
+                          className="text-or-website"
+                          vertical
+                        />
+                        <CurrentTimeDisplay className="text-or-website" />
+                        <TimeDivider className="text-or-website" />
+                        <DurationDisplay className="text-or-website" />
+                      </ControlBar>
+                    </Player>
+                    <button
+                      onClick={toggleMute}
+                      className="mt-2 p-2 bg-or-website text-white rounded"
+                    >
+                      {isMuted ? <MdVolumeOff /> : <MdVolumeUp />}
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
           </div>

@@ -106,7 +106,7 @@ const CreatePost = () => {
             </div>
           </div>
           <textarea
-            className="textarea w-full p-0 text-lg resize-none border-none focus:outline-none"
+            className="textarea w-full h-40 p-0 text-lg resize-none border-none focus:outline-none"
             placeholder="What is happening?!"
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -153,7 +153,6 @@ const CreatePost = () => {
                 <DurationDisplay className="text-or-website" />
               </ControlBar>
             </Player>
-            {/* Bouton pour activer/désactiver le son */}
             <button
               onClick={() => setIsMuted(!isMuted)}
               className="absolute bottom-[-5px] left-0 m-2  p-1 bg-or-website text-[#FAB400] rounded"

@@ -133,9 +133,21 @@ export const updateUserProfile = async (req, res) => {
       if (!check) {
         return res.status(400).json({ error: "Current Password is incorrect" });
       }
-      if (newPassword.length < 6) {
+      if (newPassword) {
+        const pwdRegex =
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+        if (!pwdRegex.test(newPassword)) {
+          return res.status(400).json({
+            error:
+              "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character.",
+          });
+        }
+      }
+
+      if (currentPassword === newPassword) {
         return res.status(400).json({
-          error: "Password must contain at least 6 characters",
+          error: "The new password cannot be the same as the current password.",
         });
       }
       user.password = await bcrypt.hash(newPassword, 12);
@@ -147,7 +159,9 @@ export const updateUserProfile = async (req, res) => {
           user.profileImg.split("/").pop().split(".")[0]
         );
       }
-      const uploadedResponse = await cloudinary.uploader.upload(profileImg);
+      const uploadedResponse = await cloudinary.uploader.upload(profileImg, {
+        folder: "profile",
+      });
       profileImg = uploadedResponse.secure_url;
     }
 
@@ -157,9 +171,12 @@ export const updateUserProfile = async (req, res) => {
           user.coverImg.split("/").pop().split(".")[0]
         );
       }
-      const uploadedResponse = await cloudinary.uploader.upload(coverImg);
+      const uploadedResponse = await cloudinary.uploader.upload(coverImg, {
+        folder: "coverImage",
+      });
       coverImg = uploadedResponse.secure_url;
     }
+
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (email) {
       if (!emailRegex.test(email)) {
@@ -178,7 +195,7 @@ export const updateUserProfile = async (req, res) => {
     if (fullName) {
       if (fullName.length < 7) {
         return res.status(400).json({
-          error: "Full name must be at least 7 caracters",
+          error: "Full name must be at least 7 characters",
         });
       }
     }
@@ -191,6 +208,7 @@ export const updateUserProfile = async (req, res) => {
         });
       }
     }
+
     console.log("Link et bio:", link, bio);
     user.fullName = fullName || user.fullName;
     user.email = email || user.email;
@@ -223,9 +241,23 @@ export const deleteAccount = async (req, res) => {
     }
 
     const userPosts = await Post.find({ user: userId });
+
     if (userPosts.length > 0) {
+      for (const post of userPosts) {
+        if (post.img) {
+          const imgId = post.img.split("/").pop().split(".")[0];
+          await cloudinary.uploader.destroy(imgId, { resource_type: "image" });
+        }
+        if (post.video) {
+          const videoId = post.video.split("/").pop().split(".")[0];
+          await cloudinary.uploader.destroy(videoId, {
+            resource_type: "video",
+          });
+        }
+      }
+
       await Post.deleteMany({ user: userId });
-      console.log(`${userPosts.length} posts deleted`);
+      console.log(`${userPosts.length} posts and associated media deleted`);
     }
 
     const userNotifications = await Notification.find({ user: userId });
@@ -235,14 +267,20 @@ export const deleteAccount = async (req, res) => {
     }
 
     if (user.profileImg) {
-      const profileImgId = user.profileImg.split("/").pop().split(".")[0]; // Extraire l'ID de l'image
-      await cloudinary.uploader.destroy(profileImgId);
+      const profileImgId = user.profileImg.split("/").pop().split(".")[0];
+      await cloudinary.uploader.destroy(profileImgId, {
+        folder: "profile",
+        resource_type: "image",
+      });
       console.log("Profile image deleted from Cloudinary");
     }
 
     if (user.coverImg) {
       const coverImgId = user.coverImg.split("/").pop().split(".")[0];
-      await cloudinary.uploader.destroy(coverImgId);
+      await cloudinary.uploader.destroy(coverImgId, {
+        folder: "coverImage",
+        resource_type: "image",
+      });
       console.log("Cover image deleted from Cloudinary");
     }
 
@@ -254,7 +292,7 @@ export const deleteAccount = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json({
-      error: "Error in deleteUser",
+      error: "Error in deleteAccount",
       message: error.message,
       stack: error.stack,
     });

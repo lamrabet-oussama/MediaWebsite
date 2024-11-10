@@ -13,15 +13,12 @@ const userSchema = new mongoose.Schema(
     },
     birthDay: {
       type: String,
-      required: true,
     },
     birthMonth: {
       type: String,
-      required: true,
     },
     birthYear: {
       type: String,
-      required: true,
     },
     password: {
       type: String,
@@ -68,6 +65,14 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
+userSchema.pre("save", function (next) {
+  if (this.isNew) {
+    // Si c'est un nouvel utilisateur, valider les champs obligatoires
+    if (!this.birthDay || !this.birthMonth || !this.birthYear) {
+      return next(new Error("All required fields must be provided"));
+    }
+  }
+  next();
+});
 const User = mongoose.model("User", userSchema);
 export default User;

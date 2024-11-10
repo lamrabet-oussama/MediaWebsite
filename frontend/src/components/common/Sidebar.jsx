@@ -31,7 +31,7 @@ const Sidebar = () => {
   const { data: notifications } = useQuery({ queryKey: ["notifications"] });
   const { data: authUser } = useQuery({ queryKey: ["authUser"] });
   return (
-    <div className="md:flex-[2_2_0] fixed   p-1 ">
+    <div className="md:flex-[2_2_0] fixed w-[20%]   p-1 ">
       <div className="sticky top-0 left-0 h-screen flex flex-col border-r border-[#FAB400] w-10 md:w-full">
         <Link to="/" className="flex justify-center md:justify-start">
           <img width="30" src={icon} alt="logo" />
@@ -78,7 +78,7 @@ const Sidebar = () => {
         {authUser && (
           <Link
             to={`/profile/${authUser?.username}`}
-            className="mt-auto mb-10  gap-2  transition-all duration-300 md:border border-[#FAB400] py-2 md:px-4 rounded-full flex items-center"
+            className="mt-auto mb-10 flex-col md:flex-row gap-2  transition-all duration-300 md:border border-[#FAB400] py-2 md:px-4 rounded-full flex items-center"
           >
             <div className="avatar   md:inline-flex">
               <div className="w-8 h-8 rounded-full">

@@ -63,7 +63,6 @@ export default function LoginPage() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setLogin({ ...login, [name]: value });
-    console.log({ email, password });
   };
 
   const LoginValidation = Yup.object({
@@ -77,8 +76,7 @@ export default function LoginPage() {
   const togglePasswordVisibility = (showPassword) => {
     setShowPassword(!showPassword);
   };
-  // const dispatch = useDispatch();
-  // const navigate = useNavigate();
+
   const loginSubmit = async () => {
     const loginData = {
       email,
@@ -164,11 +162,7 @@ export default function LoginPage() {
                   className="rounded-lg font-bold uppercase p-1 mt-7 bg-[#FFC122]   "
                   type="submit"
                 >
-                  {isPending ? (
-                    <ClipLoader color="#FAB400" size="10" />
-                  ) : (
-                    "LOG IN"
-                  )}
+                  {isPending ? "Loading..." : "LOG IN"}
                 </button>
                 <Link
                   className="rounded-lg hover:bg-stone-100 text-center font-bold uppercase p-1 mt-7 text-[#FFC122] border-or-website border active:bg-or-website active:text-white "
@@ -191,18 +185,12 @@ export default function LoginPage() {
             )}
           </Formik>
 
-          {/*Sign up */}
-          <div></div>
-
           {isError && (
-            <div className="text-or-website text-center">{error.message}</div>
+            <div className="text-orange-600 text-center">{error.message}</div>
           )}
         </div>
-        {/* <Link to="/">
-          <strong>Create a page</strong> for a celebrate,brand or buiseness
-        </Link> */}
       </div>
-      <p className="text-center font-bold ">
+      <p className="text-center  ">
         Welcome to Friends – your new social hub where connections come to life.
       </p>
       {/*Register Form */}

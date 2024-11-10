@@ -31,9 +31,9 @@ const EditProfileModal = ({ authUser }) => {
     }
   }, [authUser]);
   return (
-    <>
+    <div>
       <button
-        className="btn btn-outline rounded-full text-or-website btn-sm"
+        className="btn btn-outline rounded-full mx-3 text-or-website btn-sm"
         onClick={() =>
           document.getElementById("edit_profile_modal").showModal()
         }
@@ -80,7 +80,7 @@ const EditProfileModal = ({ authUser }) => {
               />
               <textarea
                 placeholder="Bio"
-                className="flex-1 input border border-or-website rounded p-2 input-md"
+                className=" w-full resize-none text-justify input h-28 border border-or-website rounded p-2 input-md"
                 value={formData.bio}
                 name="bio"
                 onChange={handleInputChange}
@@ -125,7 +125,7 @@ const EditProfileModal = ({ authUser }) => {
           <button className="outline-none">close</button>
         </form>
       </dialog>
-    </>
+    </div>
   );
 };
 export default EditProfileModal;
