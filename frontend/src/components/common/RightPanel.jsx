@@ -23,7 +23,7 @@ const RightPanel = () => {
   const { follow, isPending } = useFollow();
   if (suggestedUsers?.length === 0) return <div className="md:w-64 w-0"></div>;
   return (
-    <div className="hidden fixed w-[23rem] right-0 top-0 lg:block my-4 mx-2">
+    <div className="hidden fixed xl:w-[21rem] right-0 top-0 xl:block my-4 mx-2">
       <div className="border border-[#FAB400] rounded-md text-[#FAB400] p-4  sticky top-2">
         <p className="font-bold">Who to follow</p>
         <div className="flex flex-col gap-4">

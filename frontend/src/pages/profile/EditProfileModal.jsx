@@ -45,9 +45,9 @@ const EditProfileModal = ({ authUser }) => {
           <h3 className="font-bold text-lg my-3">Update Profile</h3>
           <form
             className="flex flex-col gap-4"
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
-              updateProfile();
+              await updateProfile(formData);
             }}
           >
             <div className="flex flex-wrap gap-2">
@@ -105,7 +105,7 @@ const EditProfileModal = ({ authUser }) => {
               />
             </div>
             <input
-              type="text"
+              type="url"
               placeholder="Link"
               className="flex-1 input border border-or-website rounded p-2 input-md"
               value={formData.link}

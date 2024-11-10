@@ -83,9 +83,8 @@ export default function SignUpPage() {
       toast.error(error.message);
     },
     onSuccess: () => {
-      toast.success("Signup successful");
+      toast.success("Signup successfully");
       queryClient.invalidateQueries({ queryKey: ["authUser"] });
-      navigate("/");
     },
   });
 
@@ -199,7 +198,7 @@ export default function SignUpPage() {
               />
             </div>
 
-            <h2 className="font-bold text-xl lg:text-3xl text-center p-3  ml-28 mr-20  mb-5">
+            <h2 className="font-bold text-lg md:text-3xl text-center p-3  ml-28 mr-20  mb-5">
               Sign Up
             </h2>
 

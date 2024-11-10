@@ -5,7 +5,9 @@ import Posts from "../../components/common/Posts";
 import ProfileHeaderSkeleton from "../../components/skeletons/ProfileHeaderSkeleton";
 import EditProfileModal from "./EditProfileModal";
 import useFollow from "../../hooks/useFollow.jsx";
-import { POSTS } from "../../utils/db/dummy";
+import { IoSettingsSharp } from "react-icons/io5";
+import axios from "axios";
+import { MdDelete } from "react-icons/md";
 
 import { FaArrowLeft } from "react-icons/fa6";
 import { IoCalendarOutline } from "react-icons/io5";
@@ -18,11 +20,50 @@ import useUpdateUserProfile from "../../hooks/useUpdateUserProfile.jsx";
 export default function ProfilePage() {
   const [coverImg, setCoverImg] = useState(null);
   const [profileImg, setProfileImg] = useState(null);
+
   const [feedType, setFeedType] = useState("posts");
   const { data: authUser } = useQuery({ queryKey: ["authUser"] });
   const coverImgRef = useRef(null);
   const profileImgRef = useRef(null);
   const { username } = useParams();
+  const [myPustNumber, setMyPostNumber] = useState(0);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    axios
+      .get(`/api/posts/${authUser?.username}`)
+      .then((response) => {
+        setMyPostNumber(response.data.length);
+        setLoading(false);
+      })
+      .catch((error) => {
+        toast.error(error.message);
+        setLoading(false);
+      });
+  }, []);
+  const queryClient = useQueryClient();
+  const { mutate: deleteAccount } = useMutation({
+    mutationFn: async () => {
+      try {
+        const res = await fetch("/api/users/delete", {
+          method: "DELETE",
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Something went wrong");
+        return data;
+      } catch (error) {
+        throw new Error(error.message);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
+
+      toast.success("Account deleted successfully");
+    },
+    onError: (error) => {
+      toast.error(`Error: ${error.message}`);
+    },
+  });
+
   const {
     data: user,
     isLoading,
@@ -44,10 +85,10 @@ export default function ProfilePage() {
       }
     },
   });
-  const queryClient = useQueryClient();
   const dateOfJoin = formatMemberSinceDate(user?.createdAt);
   const isMyProfile = authUser?._id === user?._id;
   const amIfollowing = authUser?.following.includes(user?._id);
+  console.log("User:", user);
   const handleImgChange = (e, state) => {
     const file = e.target.files[0];
     if (file) {
@@ -69,7 +110,7 @@ export default function ProfilePage() {
   const { follow, isPending } = useFollow();
   return (
     <>
-      <div className="!flex-[4_4_0]  w-[60%] ml-[13rem] m-auto border-r border-[#FAB400] min-h-screen">
+      <div className="!flex-[4_4_0]  ml-[3rem]  m-auto border-r border-[#FAB400] min-h-screen  overflow-x-hidden  flex flex-col     md:w-[60%] md:ml-[15rem] ">
         {/* HEADER */}
         {(isLoading || isRefetching) && <ProfileHeaderSkeleton />}
         {!isLoading && !isRefetching && !user && (
@@ -82,11 +123,36 @@ export default function ProfilePage() {
                 <Link to="/">
                   <FaArrowLeft className="w-4 h-4" />
                 </Link>
-                <div className="flex flex-col">
-                  <p className="font-bold text-lg">{user?.fullName}</p>
-                  <span className="text-sm text-slate-500">
-                    {POSTS?.length} posts
-                  </span>
+                <div className="flex justify-between w-full">
+                  <div className="flex flex-col">
+                    <p className="font-bold text-lg">{user?.fullName}</p>
+                    <span className="text-sm text-slate-500">
+                      {loading ? (
+                        <ClipLoader color="#6b7280" size="10" />
+                      ) : (
+                        myPustNumber + " posts"
+                      )}
+                    </span>
+                  </div>
+                  <div className="dropdown">
+                    <div tabIndex={0} role="button" className="m-1">
+                      <IoSettingsSharp className="w-4 text-or-website " />
+                    </div>
+                    <ul
+                      tabIndex={0}
+                      className="dropdown-content right-5 md:right-auto z-[1] p-4 text-or-website shadow bg-base-100 rounded-box w-52"
+                    >
+                      <li className="focus:bg-stone-300">
+                        <a
+                          className="bg-white flex items-center gap-3 cursor-pointer"
+                          onClick={deleteAccount}
+                        >
+                          <MdDelete className=" text-or-website" />
+                          <p>Delete Account</p>
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
               {/* COVER IMG */}
@@ -189,12 +255,12 @@ export default function ProfilePage() {
                       <>
                         <FaLink className="w-3 h-3 text-slate-500" />
                         <a
-                          href="https://youtube.com/@asaprogrammer_"
+                          href={user?.link}
                           target="_blank"
                           rel="noreferrer"
                           className="text-sm text-blue-500 hover:underline"
                         >
-                          youtube.com/@asaprogrammer_
+                          {user?.link}
                         </a>
                       </>
                     </div>

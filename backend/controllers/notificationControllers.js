@@ -20,8 +20,8 @@ export const getNotification = async (req, res) => {
     return res.status(200).json(notification);
   } catch (error) {
     return res.status(500).json({
-      message: "Error in getNotification",
-      error: error.message,
+      error: "Error in getting Notifications",
+      message: error.message,
       errorStack: error.stack,
     });
   }
@@ -46,8 +46,8 @@ export const deleteNotification = async (req, res) => {
     });
   } catch (error) {
     return res.status(500).json({
-      message: "Error in deleteNotification",
-      error: error.message,
+      error: "Error in deleting Notifications",
+      message: error.message,
       errorStack: error.stack,
     });
   }
@@ -66,8 +66,8 @@ export const deleteAllNotifications = async (req, res) => {
     res.status(200).json({ message: "Notifications deleted successfully" });
   } catch (error) {
     return res.status(500).json({
-      message: "Error in deleteAllNotifications",
-      error: error.message,
+      error: "Error in deleting All Notifications",
+      message: error.message,
       errorStack: error.stack,
     });
   }

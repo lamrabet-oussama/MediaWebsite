@@ -8,26 +8,21 @@ const useUpdateUserProfile = () => {
     useMutation({
       mutationFn: async (formData) => {
         try {
+          console.log("Form:", formData);
+
           const res = await fetch(`/api/users/update`, {
-            method: "PATCH", // Utilisez PATCH si c'est ce que l'API attend
+            method: "PATCH",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify(formData),
           });
-
-          // Si la réponse n'est pas ok, jettez une erreur
+          const data = await res.json();
           if (!res.ok) {
-            const errorText = await res.text(); // Récupère le texte de la réponse en cas d'erreur
-            throw new Error(errorText || "Something went wrong");
+            throw new Error(data.error || "Something went wrong");
           }
-
-          // Vérifiez si la réponse est au format JSON
-          const data = await res.json(); // Cette ligne peut lever une erreur si ce n'est pas du JSON
           return data;
         } catch (error) {
-          // Afficher l'erreur dans la console ou dans un toast
-          toast.error(error.message || "An error occurred");
           throw new Error(error.message);
         }
       },

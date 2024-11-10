@@ -28,10 +28,11 @@ const Sidebar = () => {
       queryClient.invalidateQueries({ queryKey: ["authUser"] });
     },
   });
+  const { data: notifications } = useQuery({ queryKey: ["notifications"] });
   const { data: authUser } = useQuery({ queryKey: ["authUser"] });
   return (
     <div className="md:flex-[2_2_0] fixed   p-1 ">
-      <div className="sticky top-0 left-0 h-screen flex flex-col border-r border-[#FAB400] w-20 md:w-full">
+      <div className="sticky top-0 left-0 h-screen flex flex-col border-r border-[#FAB400] w-10 md:w-full">
         <Link to="/" className="flex justify-center md:justify-start">
           <img width="30" src={icon} alt="logo" />
         </Link>
@@ -39,9 +40,9 @@ const Sidebar = () => {
           <li className="flex justify-center md:justify-start">
             <Link
               to="/"
-              className="flex gap-3 items-center hover:bg-slate-50 transition-all border-b-2 border-[#FAB400]  w-full duration-300 py-2 pl-2 pr-4  cursor-pointer "
+              className="flex gap-3 items-center hover:bg-slate-50 transition-all border-b-2 border-[#FAB400] text-center  w-full duration-300 py-2 pl-2 pr-4  cursor-pointer "
             >
-              <MdHomeFilled className="w-8 h-8  " />
+              <MdHomeFilled className="md:w-8 md:h-8  " />
               <span className="text-lg hidden md:block">Home</span>
             </Link>
           </li>
@@ -50,7 +51,16 @@ const Sidebar = () => {
               to="/notifications"
               className="flex gap-3 items-center hover:bg-slate-50 transition-all border-b-2 border-[#FAB400]  w-full duration-300 py-2 pl-2 pr-4  cursor-pointer "
             >
-              <IoNotifications className="w-6 h-6" />
+              <div className="relative">
+                {notifications?.length > 0 && (
+                  <span className="absolute left-[-5px] top-[-10px] text-sm p-1 text-center scale-50 md:scale-75 text-white font-bold bg-red-500 border border-red-700  rounded-full ">
+                    {notifications?.length}
+                  </span>
+                )}
+
+                <IoNotifications className="md:w-6 md:h-6" />
+              </div>
+
               <span className="text-lg hidden md:block">Notifications</span>
             </Link>
           </li>
@@ -60,7 +70,7 @@ const Sidebar = () => {
               to={`/profile/${authUser?.username}`}
               className="flex gap-3 items-center hover:bg-slate-50 transition-all   w-full duration-300 py-2 pl-2 pr-4  cursor-pointer "
             >
-              <FaUser className="w-6 h-6" />
+              <FaUser className="md:w-6 md:h-6" />
               <span className="text-lg hidden md:block">Profile</span>
             </Link>
           </li>
@@ -68,10 +78,10 @@ const Sidebar = () => {
         {authUser && (
           <Link
             to={`/profile/${authUser?.username}`}
-            className="mt-auto mb-10  gap-2  transition-all duration-300 border border-[#FAB400] py-2 px-4 rounded-full flex items-center"
+            className="mt-auto mb-10  gap-2  transition-all duration-300 md:border border-[#FAB400] py-2 md:px-4 rounded-full flex items-center"
           >
-            <div className="avatar hidden md:inline-flex">
-              <div className="w-8 rounded-full">
+            <div className="avatar   md:inline-flex">
+              <div className="w-8 h-8 rounded-full">
                 <img src={authUser?.profileImg || "/avatar-placeholder.png"} />
               </div>
             </div>

@@ -6,6 +6,8 @@ import { FaUser } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa6";
 import "./style.css";
 import toast from "react-hot-toast";
+import { MdDelete } from "react-icons/md";
+
 const NotificationPage = () => {
   const queryClient = useQueryClient();
   const { data: notifications, isLoading } = useQuery({
@@ -14,9 +16,8 @@ const NotificationPage = () => {
       try {
         const res = await fetch("/api/notifications");
         const data = await res.json();
-        console.log(data);
         if (!res.ok) {
-          throw new Error(data.erro || "Something went wrong");
+          throw new Error(data.error || "Something went wrong");
         }
         return data;
       } catch (error) {
@@ -24,6 +25,7 @@ const NotificationPage = () => {
       }
     },
   });
+
   const { mutate: deleteNotifications } = useMutation({
     mutationFn: async () => {
       try {
@@ -45,23 +47,24 @@ const NotificationPage = () => {
 
   return (
     <>
-      <div className="flex-[4_4_0]  w-[60%] ml-[13rem] m-auto border-r border-[#FAB400] min-h-screen">
+      <div className="flex-[4_4_0]    m-auto overflow-x-hidden  border-r  border-[#FAB400] min-h-screen flex flex-col   ml-[3rem]  md:w-[60%] md:ml-[15rem]  ">
         <div className="flex justify-between text-[#FAB400] items-center p-4 border-b border-[#FAB400]">
           <p className="font-bold">Notifications</p>
-          <div className="dropdown ">
+          <div className="dropdown">
             <div tabIndex={0} role="button" className="m-1">
               <IoSettingsOutline className="w-4" />
             </div>
             <ul
               tabIndex={0}
-              className="dropdown-content z-[1]  p-4  shadow bg-base-100 rounded-box w-52  "
+              className="dropdown-content right-5 md:rigth-auto z-[1] p-4 shadow bg-base-100 rounded-box w-52"
             >
-              <li className="  focus:bg-stone-300   ">
+              <li className="focus:bg-stone-300">
                 <a
-                  className="bg-white cursor-pointer "
+                  className="bg-white flex items-center gap-3 cursor-pointer"
                   onClick={deleteNotifications}
                 >
-                  Delete all notifications
+                  <MdDelete className=" text-or-website" />
+                  <p>Delete Account</p>
                 </a>
               </li>
             </ul>
@@ -77,7 +80,7 @@ const NotificationPage = () => {
         )}
         {notifications?.map((notification) => (
           <div
-            className="border-b border-[#FAB400] hover:bg-slate-50 "
+            className="border-b border-[#FAB400] hover:bg-slate-50"
             key={notification._id}
           >
             <div className="flex gap-2 p-4">
@@ -114,4 +117,5 @@ const NotificationPage = () => {
     </>
   );
 };
+
 export default NotificationPage;

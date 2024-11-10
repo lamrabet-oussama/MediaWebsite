@@ -1,4 +1,3 @@
-/* Ajoutez ce code dans votre fichier CSS */
 .custom-menu-item:focus {
   background-color: #fab400 !important ; /* Remplacez #VotreCouleur par la couleur désirée */
 }

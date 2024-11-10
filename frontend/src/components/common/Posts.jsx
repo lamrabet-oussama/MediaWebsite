@@ -27,7 +27,6 @@ const Posts = ({ feedType, username }) => {
   } = useQuery({
     queryKey: ["posts"],
     queryFn: async () => {
-      // eslint-disable-next-line no-useless-catch
       try {
         const response = await fetch(POST_ENDPOINT);
         const data = await response.json();
@@ -36,7 +35,7 @@ const Posts = ({ feedType, username }) => {
         }
         return data;
       } catch (error) {
-        throw error;
+        throw new Error(error.message);
       }
     },
   });

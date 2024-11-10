@@ -8,7 +8,7 @@ export default function HomePage() {
 
   return (
     <>
-      <div className="flex-[4_4_0]  w-[60%] ml-[13rem] m-auto border-r border-[#FAB400] min-h-screen">
+      <div className="flex flex-col   ml-[3rem]   md:w-full xl:w-[60%] md:ml-[15rem]  m-auto border-r border-[#FAB400] min-h-screen">
         {/* Header */}
         <div className="flex w-full border-b text-[#FAB400] border-[#FAB400] ">
           <div

@@ -62,8 +62,8 @@ export const signup = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
-      message: "Internal Server Error",
-      error: error.message,
+      error: "Internal Server Error",
+      message: error.message,
       errorStack: error.stack,
     });
   }
@@ -123,7 +123,7 @@ export const getMe = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(401).json({
-      error: "Error in getMe",
+      error: "Error in get authorized User",
       message: "Unauthorized",
       stack: error.stack,
     });

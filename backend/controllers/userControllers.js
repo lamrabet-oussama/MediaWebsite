@@ -1,4 +1,5 @@
 import Notification from "../models/notificationModel.js";
+import Post from "../models/postModel.js";
 import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import { v2 as cloudinary } from "cloudinary";
@@ -181,7 +182,16 @@ export const updateUserProfile = async (req, res) => {
         });
       }
     }
-
+    if (link) {
+      const linkRegex =
+        /^(https:\/\/)([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}(:\d+)?(\/[^\s]*)?$/;
+      if (!linkRegex.test(link)) {
+        return res.status(400).json({
+          error: "Please Enter a valid URL",
+        });
+      }
+    }
+    console.log("Link et bio:", link, bio);
     user.fullName = fullName || user.fullName;
     user.email = email || user.email;
     user.bio = bio || user.bio;
@@ -196,6 +206,55 @@ export const updateUserProfile = async (req, res) => {
     console.log(error);
     return res.status(500).json({
       error: "Error in updateUserProfile",
+      message: error.message,
+      stack: error.stack,
+    });
+  }
+};
+
+export const deleteAccount = async (req, res) => {
+  const userId = req.user._id;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const userPosts = await Post.find({ user: userId });
+    if (userPosts.length > 0) {
+      await Post.deleteMany({ user: userId });
+      console.log(`${userPosts.length} posts deleted`);
+    }
+
+    const userNotifications = await Notification.find({ user: userId });
+    if (userNotifications.length > 0) {
+      await Notification.deleteMany({ user: userId });
+      console.log(`${userNotifications.length} notifications deleted`);
+    }
+
+    if (user.profileImg) {
+      const profileImgId = user.profileImg.split("/").pop().split(".")[0]; // Extraire l'ID de l'image
+      await cloudinary.uploader.destroy(profileImgId);
+      console.log("Profile image deleted from Cloudinary");
+    }
+
+    if (user.coverImg) {
+      const coverImgId = user.coverImg.split("/").pop().split(".")[0];
+      await cloudinary.uploader.destroy(coverImgId);
+      console.log("Cover image deleted from Cloudinary");
+    }
+
+    await User.findByIdAndDelete(userId);
+
+    return res.status(200).json({
+      message: "Account and all associated data deleted successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      error: "Error in deleteUser",
       message: error.message,
       stack: error.stack,
     });

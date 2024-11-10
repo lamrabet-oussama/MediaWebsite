@@ -55,8 +55,8 @@ export const createPost = async (req, res) => {
     res.status(201).json(newPost);
   } catch (error) {
     res.status(500).json({
-      message: "Error in createPost",
-      error: error.message,
+      error: "Error in createPost",
+      message: error.message,
       errorStack: error.stack,
     });
   }
@@ -92,8 +92,8 @@ export const deletePost = async (req, res) => {
     });
   } catch (error) {
     return res.status(500).json({
-      message: "Error in deletePost",
-      error: error.message,
+      error: "Error in deleting Post",
+      message: error.message,
       errorStack: error.stack,
     });
   }
@@ -130,8 +130,8 @@ export const commentOnPost = async (req, res) => {
     res.status(200).json(postComments);
   } catch (error) {
     return res.status(500).json({
-      message: "Error in commentOnPost",
-      error: error.message,
+      errror: "Error in comment",
+      message: error.message,
       errorStack: error.stack,
     });
   }
@@ -172,8 +172,8 @@ export const likeUnlikePost = async (req, res) => {
     }
   } catch (error) {
     return res.status(500).json({
-      message: "Error in likePost",
-      error: error.message,
+      error: "Error in like Post",
+      message: error.message,
       errorStack: error.stack,
     });
   }
@@ -197,8 +197,8 @@ export const getAllPosts = async (req, res) => {
     res.status(200).json(posts);
   } catch (error) {
     return res.status(500).json({
-      message: "Error in getAllPosts",
-      error: error.message,
+      error: "Error in get All Posts",
+      message: error.message,
       errorStack: error.stack,
     });
   }
@@ -225,8 +225,8 @@ export const getLikesPosts = async (req, res) => {
     res.status(200).json(likedPosts);
   } catch (error) {
     return res.status(500).json({
-      message: "Error in getLikesPosts",
-      error: error.message,
+      error: "Error in get Likes Posts",
+      message: error.message,
       errorStack: error.stack,
     });
   }
@@ -255,8 +255,8 @@ export const getFollowingPosts = async (req, res) => {
     res.status(200).json(feedPosts);
   } catch (error) {
     return res.status(500).json({
-      message: "Error in getFollowingPosts",
-      error: error.message,
+      error: "Error in get Following Posts",
+      message: error.message,
       errorStack: error.stack,
     });
   }
@@ -284,8 +284,8 @@ export const getUserPosts = async (req, res) => {
     res.status(200).json(posts);
   } catch (error) {
     return res.status(500).json({
-      message: "Error in getUserPosts",
-      error: error.message,
+      error: "Error in getUserPosts",
+      message: error.message,
       errorStack: error.stack,
     });
   }

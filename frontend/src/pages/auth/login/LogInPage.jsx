@@ -18,6 +18,7 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import LoginInput from "../../../components/LoginInput";
 export default function LoginPage() {
+  const navigate = useNavigate();
   const loginInfos = {
     email: "",
     password: "",
@@ -47,12 +48,13 @@ export default function LoginPage() {
       }
     },
     onError: (error) => {
-      console.error("Login failed:", error.message);
-      toast.error(error);
+      console.log("Login failed:", error.stack);
+      toast.error(error.message);
       queryClient.invalidateQueries({ queryKey: ["authUser"] });
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success("Login successful");
+      navigate("/");
       queryClient.invalidateQueries({ queryKey: ["authUser"] });
     },
   });
@@ -87,8 +89,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="gradient-background h-screen flex flex-col items-center justify-center gap-7   ">
-      <div className="flex items-center justify-center gap-20">
+    <div className="gradient-background h-screen flex  flex-col items-center justify-center gap-7   ">
+      <div className="flex items-center justify-center  gap-20">
         <div className="hidden lg:block ">
           <motion.img
             initial={{ rotate: 0 }}
@@ -104,32 +106,32 @@ export default function LoginPage() {
           />
         </div>
         {/*Login form */}
-        <div className="login-bg shadow-md relative p-10   rounded-lg">
+        <div className="login-bg  shadow-md relative p-10  md:w-80  rounded-lg">
           <div>
             <img
               src={icon}
-              className="block lg:hidden absolute z-[4] "
+              className="block lg:hidden left-[10px] top-[15px] absolute z-[4] "
               alt="Logo"
               width="30"
             />
           </div>
           <div>
             <img
-              className="absolute top-0 rounded-tl-lg z-[2] left-0"
-              width="200"
+              className="absolute w-[150px] md:w-[200px] top-0 rounded-tl-lg z-[2] left-0"
               src={shape2}
               alt="triangle1"
             />
           </div>
           <div>
             <img
-              className="absolute top-0 rounded-tl-lg  z-[3] left-0"
-              width="160"
+              className="absolute w-[120px]  md:w-[160px] top-0 rounded-tl-lg  z-[3] left-0"
               src={shape1}
               alt="triangle1"
             />
           </div>
-          <h2 className="font-bold text-3xl text-center mb-5">Login</h2>
+          <h2 className="font-bold text-xl ml-6 md:ml-auto md:text-3xl  w-full text-center mb-5">
+            Login
+          </h2>
           <Formik
             enableReinitialize
             initialValues={{
@@ -140,7 +142,7 @@ export default function LoginPage() {
             onSubmit={loginSubmit}
           >
             {(formik) => (
-              <Form className=" login-form flex flex-col  mt-24  w-[300px]">
+              <Form className=" login-form flex flex-col  mt-24  ">
                 <LoginInput
                   placeholder="Email"
                   type="text"
@@ -162,7 +164,11 @@ export default function LoginPage() {
                   className="rounded-lg font-bold uppercase p-1 mt-7 bg-[#FFC122]   "
                   type="submit"
                 >
-                  {isPending ? "Loading..." : "LOG IN"}
+                  {isPending ? (
+                    <ClipLoader color="#FAB400" size="10" />
+                  ) : (
+                    "LOG IN"
+                  )}
                 </button>
                 <Link
                   className="rounded-lg hover:bg-stone-100 text-center font-bold uppercase p-1 mt-7 text-[#FFC122] border-or-website border active:bg-or-website active:text-white "

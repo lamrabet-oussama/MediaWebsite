@@ -8,7 +8,10 @@ export default {
   theme: {
     extend: {
       colors: {
-        "or-website": "#FAB400", // Votre couleur personnalisée
+        "or-website": "#FAB400",
+        darkText: "#FFF",
+        darkButton: "rgb(29, 155, 240)",
+        darkBg: "#000",
       },
     },
   },

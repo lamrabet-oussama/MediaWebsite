@@ -141,17 +141,17 @@ const Post = ({ post }) => {
 
   return (
     <>
-      <div className="flex gap-2 items-start p-4 border-b border-or-website">
-        <div className="avatar">
-          <Link
-            to={`/profile/${postOwner?.username}`}
-            className="w-8 rounded-full overflow-hidden"
-          >
-            <img src={postOwner?.profileImg || "/avatar-placeholder.png"} />
-          </Link>
-        </div>
-        <div className="flex flex-col flex-1">
-          <div className="flex gap-2 items-center">
+      <div className="flex flex-col gap-2 items-start   p-4 border-b border-or-website">
+        <div className="flex items-center gap-3 flex-1 ">
+          <div className="avatar">
+            <Link
+              to={`/profile/${postOwner?.username}`}
+              className="w-8 h-8 rounded-full block overflow-hidden"
+            >
+              <img src={postOwner?.profileImg || "/avatar-placeholder.png"} />
+            </Link>
+          </div>
+          <div className="md:flex gap-3  ">
             <Link to={`/profile/${postOwner?.username}`} className="font-bold">
               {postOwner?.fullName}
             </Link>
@@ -162,6 +162,11 @@ const Post = ({ post }) => {
               <span>·</span>
               <span>{formattedDate}</span>
             </span>
+          </div>
+        </div>
+
+        <div className="flex flex-col  w-full ">
+          <div className="flex gap-2 items-center ">
             {isMyPost && (
               <span className="flex justify-end flex-1">
                 {isDeleting ? (
