@@ -28,9 +28,14 @@ export const signup = async (req, res) => {
     if (existingEmail) {
       return res.status(400).json({ error: "Existing Email" });
     }
-    if (password < 6) {
+    if (password.length < 6) {
       return res.status(400).json({
         error: "Password must be at least 6 characters",
+      });
+    }
+    if (username.lenght < 5) {
+      return res.status(400).json({
+        error: "username must be at least 5 characters",
       });
     }
     const encryptedPassword = await bcrypt.hash(password, 12);
