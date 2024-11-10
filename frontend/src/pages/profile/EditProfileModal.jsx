@@ -1,6 +1,8 @@
-import { useState } from "react";
-
-const EditProfileModal = () => {
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import ClipLoader from "react-spinners/ClipLoader";
+import useUpdateUserProfile from "../../hooks/useUpdateUserProfile";
+const EditProfileModal = ({ authUser }) => {
   const [formData, setFormData] = useState({
     fullName: "",
     username: "",
@@ -10,11 +12,24 @@ const EditProfileModal = () => {
     newPassword: "",
     currentPassword: "",
   });
-
+  console.log(formData);
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
+  const { updateProfile, isUpdatingProfile } = useUpdateUserProfile(formData);
+  useEffect(() => {
+    if (authUser) {
+      setFormData({
+        fullName: authUser.fullName,
+        username: authUser.username,
+        email: authUser.email,
+        link: authUser.link,
+        bio: authUser.bio,
+        newPassword: "",
+        currentPassword: "",
+      });
+    }
+  }, [authUser]);
   return (
     <>
       <button
@@ -32,7 +47,7 @@ const EditProfileModal = () => {
             className="flex flex-col gap-4"
             onSubmit={(e) => {
               e.preventDefault();
-              alert("Profile updated successfully");
+              updateProfile();
             }}
           >
             <div className="flex flex-wrap gap-2">
@@ -51,6 +66,7 @@ const EditProfileModal = () => {
                 value={formData.username}
                 name="username"
                 onChange={handleInputChange}
+                disabled={true}
               />
             </div>
             <div className="flex flex-wrap gap-2">
@@ -96,8 +112,12 @@ const EditProfileModal = () => {
               name="link"
               onChange={handleInputChange}
             />
-            <button className="btn btn-or-website rounded-full btn-sm text-black bg-or-website">
-              Update
+            <button className="btn btn-or-website rounded-full btn-sm text-white bg-or-website">
+              {isUpdatingProfile ? (
+                <ClipLoader color="#FFF" size="20" />
+              ) : (
+                "Update"
+              )}
             </button>
           </form>
         </div>

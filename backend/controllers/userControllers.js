@@ -159,9 +159,30 @@ export const updateUserProfile = async (req, res) => {
       const uploadedResponse = await cloudinary.uploader.upload(coverImg);
       coverImg = uploadedResponse.secure_url;
     }
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (email) {
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({
+          error: "Invalid email format",
+        });
+      }
+    }
+    if (username) {
+      if (username !== user.username) {
+        return res.status(400).json({
+          error: "You cannot update the username",
+        });
+      }
+    }
+    if (fullName) {
+      if (fullName.length < 7) {
+        return res.status(400).json({
+          error: "Full name must be at least 7 caracters",
+        });
+      }
+    }
 
     user.fullName = fullName || user.fullName;
-    user.username = username || user.username;
     user.email = email || user.email;
     user.bio = bio || user.bio;
     user.link = link || user.link;
@@ -172,6 +193,7 @@ export const updateUserProfile = async (req, res) => {
     user.password = null; // Retirer le mot de passe pour la réponse
     return res.status(200).json(user);
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       error: "Error in updateUserProfile",
       message: error.message,

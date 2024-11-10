@@ -4,24 +4,25 @@ import { formatMemberSinceDate } from "../../utils/date/index.js";
 import Posts from "../../components/common/Posts";
 import ProfileHeaderSkeleton from "../../components/skeletons/ProfileHeaderSkeleton";
 import EditProfileModal from "./EditProfileModal";
-
+import useFollow from "../../hooks/useFollow.jsx";
 import { POSTS } from "../../utils/db/dummy";
 
 import { FaArrowLeft } from "react-icons/fa6";
 import { IoCalendarOutline } from "react-icons/io5";
 import { FaLink } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import ClipLoader from "react-spinners/ClipLoader.js";
+import toast from "react-hot-toast";
+import useUpdateUserProfile from "../../hooks/useUpdateUserProfile.jsx";
 export default function ProfilePage() {
   const [coverImg, setCoverImg] = useState(null);
   const [profileImg, setProfileImg] = useState(null);
   const [feedType, setFeedType] = useState("posts");
-
+  const { data: authUser } = useQuery({ queryKey: ["authUser"] });
   const coverImgRef = useRef(null);
   const profileImgRef = useRef(null);
-  const { username, id } = useParams();
-  console.log("username", username);
-  const isMyProfile = false;
+  const { username } = useParams();
   const {
     data: user,
     isLoading,
@@ -43,8 +44,10 @@ export default function ProfilePage() {
       }
     },
   });
+  const queryClient = useQueryClient();
   const dateOfJoin = formatMemberSinceDate(user?.createdAt);
-
+  const isMyProfile = authUser?._id === user?._id;
+  const amIfollowing = authUser?.following.includes(user?._id);
   const handleImgChange = (e, state) => {
     const file = e.target.files[0];
     if (file) {
@@ -56,13 +59,17 @@ export default function ProfilePage() {
       reader.readAsDataURL(file);
     }
   };
-  console.log("feed:", feedType);
   useEffect(() => {
     refetch();
   }, [username, refetch]);
+  const { updateProfile, isUpdatingProfile } = useUpdateUserProfile({
+    profileImg,
+    coverImg,
+  });
+  const { follow, isPending } = useFollow();
   return (
     <>
-      <div className="flex-[4_4_0]  w-[60%] ml-[13rem] m-auto border-r border-[#FAB400] min-h-screen">
+      <div className="!flex-[4_4_0]  w-[60%] ml-[13rem] m-auto border-r border-[#FAB400] min-h-screen">
         {/* HEADER */}
         {(isLoading || isRefetching) && <ProfileHeaderSkeleton />}
         {!isLoading && !isRefetching && !user && (
@@ -134,21 +141,35 @@ export default function ProfilePage() {
                 </div>
               </div>
               <div className="flex justify-end px-4 mt-5">
-                {isMyProfile && <EditProfileModal />}
+                {isMyProfile && <EditProfileModal authUser={authUser} />}
                 {!isMyProfile && (
                   <button
                     className="btn text-or-website btn-outline rounded-full btn-sm"
-                    onClick={() => alert("Followed successfully")}
+                    onClick={() => follow(user?._id)}
                   >
-                    Follow
+                    {isPending && <ClipLoader color="#FFF" size="20" />}
+                    {!isPending && amIfollowing && "Unfollow"}
+                    {!isPending && !amIfollowing && "Follow"}
                   </button>
                 )}
                 {(coverImg || profileImg) && (
                   <button
-                    className="btn bg-white text-or-website rounded-full btn-sm border-[#FAB400] px-4 ml-2 btn-outline"
-                    onClick={() => alert("Profile updated successfully")}
+                    className={`${
+                      isUpdatingProfile
+                        ? "border-[#000] bg-black"
+                        : "border-[#FAB400] bg-white"
+                    } btn  text-or-website rounded-full btn-sm  px-4 ml-2 btn-outline`}
+                    onClick={async () => {
+                      await updateProfile({ profileImg, coverImg });
+                      setCoverImg(null);
+                      setProfileImg(null);
+                    }}
                   >
-                    Update
+                    {isUpdatingProfile ? (
+                      <ClipLoader color="#FFF" size="20" />
+                    ) : (
+                      "Update"
+                    )}
                   </button>
                 )}
               </div>
