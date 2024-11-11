@@ -23,7 +23,13 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-
+app.use((req, res, next) => {
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'self'; media-src 'self' https://res.cloudinary.com"
+  );
+  next();
+});
 // Middlewares de sécurité
 app.use(helmet()); // Sécuriser les en-têtes HTTP
 const limiter = rateLimit({
