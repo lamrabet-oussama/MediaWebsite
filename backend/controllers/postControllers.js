@@ -33,8 +33,8 @@ export const createPost = async (req, res) => {
           cloudinary.uploader.upload_large(
             video,
             {
-              folder: "videos_folder", // Spécifie le dossier pour les vidéos
-              resource_type: "video", // Assure que le fichier est traité en tant que vidéo
+              folder: "videos_folder",
+              resource_type: "video",
             },
             (error, result) => {
               if (error) return reject(error);
@@ -114,9 +114,10 @@ export const commentOnPost = async (req, res) => {
     const { text } = req.body;
     if (!text) {
       return res.status(400).json({
-        error: "Text fiels is required",
+        error: "Text field is required",
       });
     }
+
     const postId = req.params.id;
     const post = await Post.findById(postId);
     if (!post) {
@@ -124,23 +125,30 @@ export const commentOnPost = async (req, res) => {
         error: "Post not found",
       });
     }
+
     const comment = {
       user: req.user._id,
       text,
     };
+
     post.comments.push(comment);
     await post.save();
+
     const notification = new Notification({
       from: req.user._id.toString(),
       to: post.user,
       type: "comment",
     });
     await notification.save();
-    const postComments = post.comments;
-    res.status(200).json(postComments);
+
+    const populatedPost = await Post.findById(postId).populate({
+      path: "comments.user",
+      select: "username profileImg fullName",
+    });
+    res.status(200).json(populatedPost.comments);
   } catch (error) {
     return res.status(500).json({
-      errror: "Error in comment",
+      error: "Error in comment",
       message: error.message,
       errorStack: error.stack,
     });

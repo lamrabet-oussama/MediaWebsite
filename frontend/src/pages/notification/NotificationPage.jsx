@@ -46,8 +46,8 @@ const NotificationPage = () => {
   });
 
   return (
-    <div className="flex justify-center items-center w-[60%] ml-[16rem]">
-      <div className="flex-[4_4_0]    m-auto overflow-x-hidden  border-r  border-[#FAB400] min-h-screen flex flex-col   ml-[3rem]  md:w-[50%]   ">
+    <>
+      <div className="flex-[4_4_0]    m-auto overflow-x-hidden  md:ml-[19rem] md:w-[50%]  border-r border-[#FAB400]  mr-auto ml-[3rem] min-h-screen        ">
         <div className="flex justify-between text-[#FAB400] items-center p-4 border-b border-[#FAB400]">
           <p className="font-bold">Notifications</p>
           <div className="dropdown">
@@ -64,7 +64,7 @@ const NotificationPage = () => {
                   onClick={deleteNotifications}
                 >
                   <MdDelete className=" text-or-website" />
-                  <p>Delete Account</p>
+                  <p className="text-sm "> Delete All Notifications</p>
                 </a>
               </li>
             </ul>
@@ -114,7 +114,7 @@ const NotificationPage = () => {
           </div>
         ))}
       </div>
-    </div>
+    </>
   );
 };
 

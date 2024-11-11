@@ -109,8 +109,8 @@ export default function ProfilePage() {
   });
   const { follow, isPending } = useFollow();
   return (
-    <div className="flex justify-center items-center w-[60%] ml-[16rem] ">
-      <div className="!flex-[4_4_0]  ml-[3rem]  m-auto border-r border-[#FAB400] min-h-screen  overflow-x-hidden  flex flex-col     md:w-[50%] ">
+    <>
+      <div className="!flex-[4_4_0]  md:ml-[19rem]   m-auto overflow-x-hidden    border-r border-[#FAB400]  mr-auto ml-[3rem] min-h-screen      md:w-[50%] ">
         {/* HEADER */}
         {(isLoading || isRefetching) && <ProfileHeaderSkeleton />}
         {!isLoading && !isRefetching && !user && (
@@ -140,7 +140,7 @@ export default function ProfilePage() {
                     </div>
                     <ul
                       tabIndex={0}
-                      className="dropdown-content right-5 md:right-auto z-[1] p-4 text-or-website shadow bg-base-100 rounded-box w-52"
+                      className="dropdown-content right-5  z-[1] p-4 text-or-website shadow bg-base-100 rounded-box w-52"
                     >
                       <li className="focus:bg-stone-300">
                         <a
@@ -310,6 +310,6 @@ export default function ProfilePage() {
           <Posts feedType={feedType} username={username} />
         </div>
       </div>
-    </div>
+    </>
   );
 }

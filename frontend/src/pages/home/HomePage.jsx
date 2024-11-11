@@ -7,8 +7,8 @@ export default function HomePage() {
   const [feedType, setFeedType] = useState("forYou");
 
   return (
-    <div className="flex justify-center items-center w-[60%] ml-[16rem]">
-      <div className="flex flex-col   ml-[3rem]   md:w-full    m-auto border-r border-[#FAB400] min-h-screen">
+    <>
+      <div className="   m-auto border-r border-[#FAB400] flex-[4_4_0] mr-auto ml-[3rem] md:ml-[19rem] md:w-[50%] min-h-screen">
         {/* Header */}
         <div className="flex w-full border-b text-[#FAB400] border-[#FAB400] ">
           <div
@@ -39,6 +39,6 @@ export default function HomePage() {
         {/* POSTS */}
         <Posts feedType={feedType} />
       </div>
-    </div>
+    </>
   );
 }

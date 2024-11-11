@@ -105,30 +105,32 @@ const Post = ({ post }) => {
         });
         const data = await res.json();
         if (!res.ok) {
-          throw new Error(data.error || "Something wen wrong");
+          throw new Error(data.error || "Something went wrong");
         }
         return data;
       } catch (error) {
         throw new Error(error.message);
       }
     },
-    onSuccess: (postComments) => {
+    onSuccess: (newComments) => {
+      const latestComment = newComments[newComments.length - 1];
       toast.success("Comment created successfully");
       setComment("");
-      //queryClient.invalidateQueries({ queryKey: ["posts"] });
       queryClient.setQueryData(["posts"], (oldData) => {
         return oldData.map((p) => {
           if (p._id === post._id) {
-            return { ...p, comments: postComments };
+            return { ...p, comments: [...p.comments, latestComment] };
           }
           return p;
         });
       });
     },
+
     onError: (error) => {
       toast.error(error.message);
     },
   });
+
   const handleDeletePost = () => {
     deletePost();
   };
@@ -279,7 +281,7 @@ const Post = ({ post }) => {
                           <div className="w-8 rounded-full">
                             <img
                               src={
-                                comment.user.profileImg ||
+                                comment?.user?.profileImg ||
                                 "/avatar-placeholder.png"
                               }
                             />
@@ -291,7 +293,7 @@ const Post = ({ post }) => {
                               {comment.user?.fullName}
                             </span>
                             <span className="text-gray-700 text-sm">
-                              @{comment.user.username}
+                              @{comment?.user?.username}
                             </span>
                           </div>
                           <div className="text-sm">{comment.text}</div>

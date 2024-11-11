@@ -25,7 +25,7 @@ const RightPanel = () => {
   return (
     <div className="hidden fixed xl:w-[21rem] right-0 top-0 xl:block my-4 mx-2">
       <div className="border border-[#FAB400] rounded-md text-[#FAB400] p-4  sticky top-2">
-        <p className="font-bold">Who to follow</p>
+        <p className="font-bold">Who to follow ?</p>
         <div className="flex flex-col gap-4">
           {/* item */}
           {isLoading && (
@@ -60,16 +60,19 @@ const RightPanel = () => {
                 </div>
                 <div>
                   <button
-                    className="btn border-[#FAB400] bg-white text-[#FAB400] hover:text-white hover:bg-[#FAB400] rounded-full btn-sm"
                     onClick={(e) => {
                       e.preventDefault();
                       follow(user?._id);
                     }}
                   >
                     {isPending ? (
-                      <ClipLoader color="#FFF" size="20" />
+                      <div className="btn border-[#FAB400] bg-or-website text-[#FAB400] hover:text-white  rounded-full btn-sm">
+                        <ClipLoader color="#FFF" size="20" />
+                      </div>
                     ) : (
-                      "Follow"
+                      <span className="btn border-[#FAB400] bg-white text-[#FAB400] hover:text-white hover:bg-[#FAB400] rounded-full btn-sm">
+                        Follow
+                      </span>
                     )}
                   </button>
                 </div>

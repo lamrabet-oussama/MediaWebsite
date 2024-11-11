@@ -2,7 +2,6 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import { v2 as cloudinary } from "cloudinary";
-import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import mongoSanitize from "express-mongo-sanitize";
 import xss from "xss-clean";
@@ -30,20 +29,21 @@ app.use((req, res, next) => {
   );
   next();
 });
+
 // Middlewares de sécurité
 app.use(helmet()); // Sécuriser les en-têtes HTTP
-const limiter = rateLimit({
-  max: 100,
-  windowMs: 60 * 60 * 1000, // Limite : 100 requêtes par heure
-  message: "Too many requests from this IP, please try again in an hour!",
-  handler: (req, res) => {
-    res.status(429).json({
-      status: "error",
-      error: "Too many requests from this IP, please try again in an hour",
-    });
-  },
-});
-app.use(limiter);
+// const limiter = rateLimit({
+//   max: 100,
+//   windowMs: 60 * 60 * 1000, // Limite : 100 requêtes par heure
+//   message: "Too many requests from this IP, please try again in an hour!",
+//   handler: (req, res) => {
+//     res.status(429).json({
+//       status: "error",
+//       error: "Too many requests from this IP, please try again in an hour",
+//     });
+//   },
+// });
+// app.use(limiter);
 app.use(express.json({ limit: "5mb" })); // Limiter la taille des requêtes
 app.use(express.urlencoded({ extended: true })); // Analyser les données URL-encoded
 app.use(cookieParser()); // Analyser les cookies

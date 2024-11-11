@@ -136,7 +136,6 @@ export default function SignUpPage() {
       ),
     username: Yup.string().required("Username is required!"),
   });
-  console.log({ email, password });
 
   /*Generate an array of the selected date */
 
@@ -260,7 +259,7 @@ export default function SignUpPage() {
                     name="password"
                     onChange={handleChange}
                   />
-                  <div className="flex flex-col gap-2  text-[#FAB400] ">
+                  <div className="flex flex-col gap-2 mt-6  text-[#FAB400] ">
                     <div className="font-bold flex items-center gap-1 mt-1">
                       <p className="">Date of birth</p>
                       <FaRegQuestionCircle />

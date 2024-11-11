@@ -260,6 +260,19 @@ export const deleteAccount = async (req, res) => {
       console.log(`${userPosts.length} posts and associated media deleted`);
     }
 
+    const postsWithUserComments = await Post.find({
+      "comments.user": userId,
+    });
+
+    for (const post of postsWithUserComments) {
+      post.comments = post.comments.filter(
+        (comment) => !comment.user.equals(userId)
+      );
+
+      await post.save();
+    }
+    console.log("User's comments deleted from other posts");
+
     const userNotifications = await Notification.find({ user: userId });
     if (userNotifications.length > 0) {
       await Notification.deleteMany({ user: userId });

@@ -31,7 +31,7 @@ const Sidebar = () => {
   const { data: notifications } = useQuery({ queryKey: ["notifications"] });
   const { data: authUser } = useQuery({ queryKey: ["authUser"] });
   return (
-    <div className="md:flex-[2_2_0] fixed w-[20%]   p-1 ">
+    <div className="md:flex-[2_2_0] fixed w-[20%]  w-18   p-1 ">
       <div className="sticky top-0 left-0 h-screen flex flex-col border-r border-[#FAB400] w-10 md:w-full">
         <Link to="/" className="flex justify-center md:justify-start">
           <img width="30" src={icon} alt="logo" />
